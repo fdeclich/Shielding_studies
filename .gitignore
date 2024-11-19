@@ -1,0 +1,5 @@
+build/
+Source_example/build/
+*.o
+*.so
+
