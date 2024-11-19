@@ -59,6 +59,7 @@
 #include "G4RunManagerFactory.hh"
 #include "G4Types.hh"
 #include "G4UImanager.hh"
+#include "G4VisExecutive.hh"
 #include "G4VPhysicalVolume.hh"
 #include "G4UIExecutive.hh"
 
@@ -136,9 +137,9 @@ int main(int argc, char** argv)
     detector->CreateWeightWindowStore();
   }
 
-  //  runManager->BeamOn(numberOfEvents);
+  G4VisManager* visManager = new G4VisExecutive;
+  visManager->Initialize();
 
-  // temporary fix before runManager->BeamOn works...
   G4UImanager* UImanager = G4UImanager::GetUIpointer();
 
   if (!ui) {
