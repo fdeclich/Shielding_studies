@@ -43,6 +43,8 @@
 #include "G4Types.hh"
 #include "G4VisAttributes.hh"
 #include "globals.hh"
+//To use pre defined elements and materials
+#include "G4NistManager.hh"
 
 #include <set>
 #include <sstream>
@@ -93,18 +95,17 @@ G4VPhysicalVolume* B01DetectorConstruction::Construct()
   G4String name, symbol;
   G4double z;
   G4double fractionmass;
-
   A = 1.01 * g / mole;
-  G4Element* elH = new G4Element(name = "Hydrogen", symbol = "H", Z = 1, A);
+  //G4Element* elH = new G4Element(name = "Hydrogen", symbol = "H", Z = 1, A);
 
   A = 12.01 * g / mole;
-  G4Element* elC = new G4Element(name = "Carbon", symbol = "C", Z = 6, A);
+  //G4Element* elC = new G4Element(name = "Carbon", symbol = "C", Z = 6, A);
 
   A = 16.00 * g / mole;
-  G4Element* elO = new G4Element(name = "Oxygen", symbol = "O", Z = 8, A);
+  //G4Element* elO = new G4Element(name = "Oxygen", symbol = "O", Z = 8, A);
 
   A = 22.99 * g / mole;
-  G4Element* elNa = new G4Element(name = "Natrium", symbol = "Na", Z = 11, A);
+  //G4Element* elNa = new G4Element(name = "Natrium", symbol = "Na", Z = 11, A);
 
   A = 200.59 * g / mole;
   G4Element* elHg = new G4Element(name = "Hg", symbol = "Hg", Z = 80, A);
@@ -124,12 +125,54 @@ G4VPhysicalVolume* B01DetectorConstruction::Construct()
   A = 55.85 * g / mole;
   G4Element* elFe = new G4Element(name = "Iron", symbol = "Fe", Z = 26, A);
 
+  //Defining materials to build the ones of the detector
+  G4Element* elC = new G4Element("Carbon", "C", 6., 12.011 * g / mole);
+  G4Element* elH = new G4Element("Hydrogen", "H", 1., 1.00784 * g / mole);
+  G4Element* elN = new G4Element("Nitrogen", "N", 7., 14.0067 * g / mole);
+  G4Element* elNa = new G4Element("Sodium", "Na", 11., 22.99 * g / mole);
+  G4Element* elO = new G4Element("Oxygen", "O", 8., 15.999 * g / mole);
+  G4Element* elS = new G4Element("Sulphur", "S", 16., 32.065 * g / mole);
+  G4Element* elB = new G4Element("Boron", "B", 5., 10.811 * g / mole);
+
+  //Defining "real" elements
+  G4NistManager* manager = G4NistManager::Instance();
+  G4Material* steel = manager->FindOrBuildMaterial("G4_STAINLESS-STEEL");
+  G4Material* cellulose = manager->FindOrBuildMaterial("G4_CELLULOSE_BUTYRATE");
+  G4Material* alluminium = manager->FindOrBuildMaterial("G4_ALUMINUM_OXIDE");
+  G4Material* polyethilene = manager->FindOrBuildMaterial("G4_POLYETHYLENE");
+
+  G4Material* lignine = new G4Material("Lignine", 1.40 * g / cm3, 6);  
+  lignine->AddElement(elC, 18);
+  lignine->AddElement(elH, 13);
+  lignine->AddElement(elN, 3);
+  lignine->AddElement(elNa, 2);
+  lignine->AddElement(elO, 8);
+  lignine->AddElement(elS, 2);
+
+  G4Material* plywood = new G4Material("Plywood", 0.50 * g / cm3, 2);
+  plywood->AddMaterial(cellulose, 0.70);
+  plywood->AddMaterial(lignine, 0.30);
+  
+  G4Material* polyurethane = new G4Material("Polyurethane", 90 * kg / m3, 4);
+  polyurethane->AddElement(elC, 27);
+  polyurethane->AddElement(elH, 36);
+  polyurethane->AddElement(elN, 2);
+  polyurethane->AddElement(elO, 10);
+
+  G4Material* BoronOxide = new G4Material("BoronOxide", 2.50 * g / cm3, 2);
+  BoronOxide->AddElement(elB, 2);
+  BoronOxide->AddElement(elO, 3);
+  
+  G4Material* BoratedPolyethilene = new G4Material("BoratedPolyethilene", 1.0 * g / cm3, 2);
+  BoratedPolyethilene->AddMaterial(polyethilene, 0.85);
+  BoratedPolyethilene->AddMaterial(BoronOxide, 0.15);
+  
   density = universe_mean_density;  // from PhysicalConstants.h
   pressure = 3.e-18 * pascal;
   temperature = 2.73 * kelvin;
   G4Material* Galactic = new G4Material(name = "Galactic", z = 1., A = 1.01 * g / mole, density,
                                         kStateGas, temperature, pressure);
-
+  
   density = 2.03 * g / cm3;
   G4Material* Concrete = new G4Material("Concrete", density, 10);
   Concrete->AddElement(elH, fractionmass = 0.01);
@@ -143,15 +186,16 @@ G4VPhysicalVolume* B01DetectorConstruction::Construct()
   Concrete->AddElement(elFe, fractionmass = 0.014);
   Concrete->AddElement(elC, fractionmass = 0.001);
 
+
   /////////////////////////////
   // world cylinder volume
   ////////////////////////////
-
+  
   // world solid
 
   G4double innerRadiusCylinder = 0 * cm;
   G4double outerRadiusCylinder = 100 * cm;
-  G4double heightCylinder = 100 * cm;
+  G4double heightCylinder = 53.635 * cm;
   G4double startAngleCylinder = 0 * deg;
   G4double spanningAngleCylinder = 360 * deg;
 
@@ -169,66 +213,60 @@ G4VPhysicalVolume* B01DetectorConstruction::Construct()
 
   fPhysicalVolumeVector.push_back(fWorldVolume);
 
-  // creating 18 slabs of 10 cm thick concrete
+  //Creating a struct to collect all the data
+  struct shieldLayer_t {
+    G4double thickness = {};
+    G4Material* material = nullptr;
+    G4Colour colour = {};
+    G4String vname = {};
+    shieldLayer_t (G4double thick, G4Material* mat, G4Colour col, G4String nam) {thickness = thick; 
+                  material = mat; colour = col; vname = nam;}
+  };
 
+  std::vector<shieldLayer_t> layers;
+  layers.emplace_back(1.5 * cm, steel, G4Colour(0.55, 0.5, 0.65), "steel0");
+  layers.emplace_back(.5 * cm, plywood, G4Colour(0.5, 0.35, 0.25), "plywood0");
+  layers.emplace_back(5 * cm, BoratedPolyethilene, G4Colour(0.3, 1.0, 0.0), "borpol0");
+  layers.emplace_back(.5 * cm, plywood, G4Colour(0.5, 0.35, 0.25), "plywood1");
+  layers.emplace_back(19.5 * cm, polyurethane, G4Colour(1.0, 1.0, 0.0), "poly0");
+  layers.emplace_back(.5 * cm, plywood, G4Colour(0.5, 0.35, 0.25), "plywood2");
+  layers.emplace_back(0.75 , steel, G4Colour(0.55, 0.5, 0.65), "steel1");
+  layers.emplace_back(.5 * cm, plywood, G4Colour(0.5, 0.35, 0.25), "plywood3");
+  layers.emplace_back(19.5 * cm, polyurethane, G4Colour(1.0, 1.0, 0.0), "poly1");
+  layers.emplace_back(.5 * cm, plywood, G4Colour(0.5, 0.35, 0.25), "plywood4");
+  layers.emplace_back(5 * cm, BoratedPolyethilene, G4Colour(0.3, 1.0, 0.0), "borpol1");
+  layers.emplace_back(.5 * cm, plywood, G4Colour(0.5, 0.35, 0.25), "plywood5");
+  layers.emplace_back(0.6 , steel, G4Colour(0.55, 0.5, 0.65), "steel2");
+
+  // Creating every layer of the cryostat: long process :(
+  //Outer frame
   G4double innerRadiusShield = 0 * cm;
   G4double outerRadiusShield = 100 * cm;
-  G4double heightShield = 5 * cm;
+  G4double heightShield = 53.635 * cm;
   G4double startAngleShield = 0 * deg;
   G4double spanningAngleShield = 360 * deg;
 
-  G4Tubs* aShield = new G4Tubs("aShield", innerRadiusShield, outerRadiusShield, heightShield,
-                               startAngleShield, spanningAngleShield);
-
-  // logical shield
-
-  G4LogicalVolume* aShield_log = new G4LogicalVolume(aShield, Concrete, "aShield_log");
-  fLogicalVolumeVector.push_back(aShield_log);
-
-  G4VisAttributes* pShieldVis = new G4VisAttributes(G4Colour(0.0, 0.0, 1.0));
-  pShieldVis->SetForceSolid(true);
-  aShield_log->SetVisAttributes(pShieldVis);
-
-  // physical shields
-
-  G4int i;
-  G4double startz = -85 * cm;
-  for (i = 1; i <= 18; i++) {
-    name = GetCellName(i);
-    pos_x = 0 * cm;
-    pos_y = 0 * cm;
-    pos_z = startz + (i - 1) * (2 * heightShield);
-    G4VPhysicalVolume* pvol = new G4PVPlacement(0, G4ThreeVector(pos_x, pos_y, pos_z), aShield_log,
-                                                name, worldCylinder_log, false, i);
-    fPhysicalVolumeVector.push_back(pvol);
-  }
-
-  // filling the rest of the world volume behind the concrete with
-  // another slab which should get the same importance value
-  // or lower weight bound as the last slab
-  //
-  innerRadiusShield = 0 * cm;
-  outerRadiusShield = 100 * cm;
-  heightShield = 5 * cm;
-  startAngleShield = 0 * deg;
-  spanningAngleShield = 360 * deg;
-
-  G4Tubs* aRest = new G4Tubs("Rest", innerRadiusShield, outerRadiusShield, heightShield,
-                             startAngleShield, spanningAngleShield);
-
-  G4LogicalVolume* aRest_log = new G4LogicalVolume(aRest, Galactic, "aRest_log");
-  fLogicalVolumeVector.push_back(aRest_log);
-  name = "rest";
-
   pos_x = 0 * cm;
   pos_y = 0 * cm;
-  pos_z = 95 * cm;
-  G4VPhysicalVolume* pvol_rest = new G4PVPlacement(0, G4ThreeVector(pos_x, pos_y, pos_z), aRest_log,
-                                                   name, worldCylinder_log, false,
-                                                   19);  // i=19
-
-  fPhysicalVolumeVector.push_back(pvol_rest);
-
+  G4double startz = -53.635 * cm;
+  pos_z = startz;
+  for (int i=0; i < layers.size(); i++) {
+    auto &l=layers.at(i);
+    G4Tubs* Solid = new G4Tubs (l.vname + "_solid", innerRadiusShield, outerRadiusShield, 
+                                l.thickness, startAngleShield, spanningAngleShield);
+    G4LogicalVolume* Logic = new G4LogicalVolume (Solid, l.material, l.vname + "_lv");
+    Logic->SetVisAttributes(l.colour);
+    fLogicalVolumeVector.push_back(Logic);
+    if (i == 0) {
+      pos_z = startz + l.thickness; 
+    }
+    else {
+      pos_z= pos_z + l.thickness + layers.at(i-1).thickness;
+    }
+    G4VPhysicalVolume* pvol = new G4PVPlacement(0, G4ThreeVector(pos_x, pos_y, pos_z), Logic,
+                                                l.vname + "_PV", worldCylinder_log, false, i, true);
+    fPhysicalVolumeVector.push_back(pvol);
+  };
   SetSensitive();
   return fWorldVolume;
 }
