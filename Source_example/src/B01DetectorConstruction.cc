@@ -162,6 +162,13 @@ G4VPhysicalVolume* B01DetectorConstruction::Construct()
   G4Material* BoronOxide = new G4Material("BoronOxide", 2.50 * g / cm3, 2);
   BoronOxide->AddElement(elB, 2);
   BoronOxide->AddElement(elO, 3);
+  const G4ElementVector* elements= BoronOxide->GetElementVector();
+  const G4double* dens = BoronOxide->GetVecNbOfAtomsPerVolume();
+  for (int i =0; i<BoronOxide->GetNumberOfElements(); i++) {
+    G4String elname= elements->at(i)->GetName();
+    G4double ndens = dens[i];
+    G4cout << "Name: " << elname.data() << " ; Density: " << ndens <<G4endl;
+  }
   
   G4Material* BoratedPolyethilene = new G4Material("BoratedPolyethilene", 1.0 * g / cm3, 2);
   BoratedPolyethilene->AddMaterial(polyethilene, 0.85);
