@@ -38,6 +38,7 @@
 #include "G4RunManager.hh"
 #include "G4THitsMap.hh"
 #include "G4UnitsTable.hh"
+#include "G4AnalysisManager.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 //
@@ -56,6 +57,9 @@ B01RunAction::B01RunAction()
   // - Prepare data member for B01Run.
   //   vector represents a list of MultiFunctionalDetector names.
   fSDName.push_back(G4String("ConcreteSD"));
+
+  G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
+  analysisManager->SetVerboseLevel(1);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -64,6 +68,11 @@ B01RunAction::B01RunAction()
 B01RunAction::~B01RunAction()
 {
   fSDName.clear();
+  G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
+  if (analysisManager->IsOpenFile()) {
+    analysisManager->Write();
+    analysisManager->CloseFile();
+  }
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -81,6 +90,17 @@ G4Run* B01RunAction::GenerateRun()
 void B01RunAction::BeginOfRunAction(const G4Run* aRun)
 {
   G4cout << "### Run " << aRun->GetRunID() << " start." << G4endl;
+  
+  G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
+  const G4int run_number = G4RunManager::GetRunManager()->GetCurrentRun()->GetRunID(); 
+  G4String filename = "B01" + std::to_string(run_number) + ".root";
+  analysisManager->OpenFile(filename);
+
+  analysisManager->CreateNtuple("ShieldingSD", "ShieldingSD");
+  analysisManager->CreateNtupleDColumn("Collisions_0");
+  analysisManager->CreateNtupleDColumn("Collisions_1");
+  analysisManager->FinishNtuple(); 
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -88,6 +108,8 @@ void B01RunAction::BeginOfRunAction(const G4Run* aRun)
 void B01RunAction::EndOfRunAction(const G4Run* aRun)
 {
   G4cout << " ###### EndOfRunAction  " << G4endl;
+  G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
+  //
   //- B01Run object.
   B01Run* b01Run = (B01Run*)aRun;
   //--- Dump all socred quantities involved in B01Run.
@@ -173,9 +195,19 @@ void B01RunAction::EndOfRunAction(const G4Run* aRun)
              << std::setw(fFieldValue) << (*SLs) << " |" << std::setw(fFieldValue) << (*SLWs)
              << " |" << std::setw(fFieldValue) << (*SLW_Vs) << " |" << std::setw(fFieldValue)
              << (*SLWEs) << " |" << std::setw(fFieldValue) << (*SLWE_Vs) << " |" << G4endl;
+
+
+      if (iz == 1 || iz == 2) {
+        analysisManager->FillNtupleDColumn(iz - 1, *SumCollisions);
+      }
     }
     G4cout << "=============================================" << G4endl;
+
+    analysisManager->AddNtupleRow();
   }
+
+  analysisManager->Write();
+  analysisManager->CloseFile();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
