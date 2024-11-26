@@ -61,6 +61,7 @@ void B01ActionInitialization::Build() const
 {
   SetUserAction(new B01PrimaryGeneratorAction);
   SetUserAction(new B01RunAction);
+  SetUserAction(new B01EventAction);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

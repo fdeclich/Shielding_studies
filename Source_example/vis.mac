@@ -3,7 +3,7 @@
 #
 
 # Specify a viewer, e.g., /vis/open OGL, or allow a system choice:
-/vis/open/OGLSQt
+/vis/open OGLSQt
 # This chooses a graphics system (in order of priority):
 # - by argument in G4VisExecutive construction.
 # - by environment variable, G4VIS_DEFAULT_DRIVER.

@@ -455,32 +455,9 @@ void B01DetectorConstruction::ConstructSDandField()
   G4PSTrackCounter* scorer3 = new G4PSTrackCounter(psName = "TrackEnter", fCurrent_In);
   MFDet->RegisterPrimitive(scorer3);
 
-  G4PSTrackLength* scorer4 = new G4PSTrackLength(psName = "SL");
+  G4PSTermination* scorer4 = new G4PSTermination (psName = "Termination_W");
+  scorer4->Weighted(true);
   MFDet->RegisterPrimitive(scorer4);
-
-  G4PSTrackLength* scorer5 = new G4PSTrackLength(psName = "SLW");
-  scorer5->Weighted(true);
-  MFDet->RegisterPrimitive(scorer5);
-
-  G4PSTrackLength* scorer6 = new G4PSTrackLength(psName = "SLWE");
-  scorer6->Weighted(true);
-  scorer6->MultiplyKineticEnergy(true);
-  MFDet->RegisterPrimitive(scorer6);
-
-  G4PSTrackLength* scorer7 = new G4PSTrackLength(psName = "SLW_V");
-  scorer7->Weighted(true);
-  scorer7->DivideByVelocity(true);
-  MFDet->RegisterPrimitive(scorer7);
-
-  G4PSTrackLength* scorer8 = new G4PSTrackLength(psName = "SLWE_V");
-  scorer8->Weighted(true);
-  scorer8->MultiplyKineticEnergy(true);
-  scorer8->DivideByVelocity(true);
-  MFDet->RegisterPrimitive(scorer8);
-
-  G4PSTermination* scorer9 = new G4PSTermination (psName = "Termination_W");
-  scorer9->Weighted(true);
-  MFDet->RegisterPrimitive(scorer9);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

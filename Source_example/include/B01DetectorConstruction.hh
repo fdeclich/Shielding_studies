@@ -64,6 +64,8 @@ class B01DetectorConstruction : public G4VUserDetectorConstruction
 
     virtual void ConstructSDandField();
 
+    inline std::vector<G4VPhysicalVolume*>& GetPhysicalVolumeVector() {return fPhysicalVolumeVector;} 
+
   private:
     std::vector<G4LogicalVolume*> fLogicalVolumeVector;
     std::vector<G4VPhysicalVolume*> fPhysicalVolumeVector;

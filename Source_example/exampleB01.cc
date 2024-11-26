@@ -129,14 +129,14 @@ int main(int argc, char** argv)
   runManager->SetUserInitialization(actions);
 
   runManager->Initialize();
-
+  
   if (mode == 0) {
     detector->CreateImportanceStore();
   }
   else {
     detector->CreateWeightWindowStore();
   }
-
+  
   G4VisManager* visManager = new G4VisExecutive;
   visManager->Initialize();
 

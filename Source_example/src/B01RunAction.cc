@@ -39,6 +39,7 @@
 #include "G4THitsMap.hh"
 #include "G4UnitsTable.hh"
 #include "G4AnalysisManager.hh"
+#include "G4VPhysicalVolume.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 //
@@ -96,9 +97,20 @@ void B01RunAction::BeginOfRunAction(const G4Run* aRun)
   G4String filename = "B01" + std::to_string(run_number) + ".root";
   analysisManager->OpenFile(filename);
 
+  G4RunManager* runmngr = G4RunManager::GetRunManager();
+  auto Detector = (B01DetectorConstruction*)runmngr->GetUserDetectorConstruction();
+  std::vector<G4VPhysicalVolume*>& pv_vec = Detector->GetPhysicalVolumeVector();
+
   analysisManager->CreateNtuple("ShieldingSD", "ShieldingSD");
-  analysisManager->CreateNtupleDColumn("Collisions_0");
-  analysisManager->CreateNtupleDColumn("Collisions_1");
+  for (int i = 0; i < pv_vec.size(); i++) {
+    G4String vol_name = pv_vec[i]->GetName();
+    analysisManager->CreateNtupleDColumn(vol_name);
+    analysisManager->CreateNtupleDColumn(vol_name + "_Collisions");
+    analysisManager->CreateNtupleDColumn(vol_name + "_Collisions_Weighted");
+    analysisManager->CreateNtupleDColumn(vol_name + "_Population");
+    analysisManager->CreateNtupleDColumn(vol_name + "_TrackEnter");
+    analysisManager->CreateNtupleDColumn(vol_name + "_Termination_Weighted");
+  }
   analysisManager->FinishNtuple(); 
 
 }

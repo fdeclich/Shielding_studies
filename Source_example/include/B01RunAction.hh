@@ -34,6 +34,7 @@
 
 #include "G4UserRunAction.hh"
 #include "globals.hh"
+#include "B01DetectorConstruction.hh"
 
 #include <vector>
 
