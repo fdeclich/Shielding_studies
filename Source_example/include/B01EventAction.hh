@@ -1,7 +1,9 @@
 #ifndef B01EventAction_h
 #define B01EventAction_h 1
 
+#include <vector>
 #include "G4UserEventAction.hh"
+#include "globals.hh"
 
 class B01EventAction:public G4UserEventAction {
     public:
@@ -13,6 +15,6 @@ class B01EventAction:public G4UserEventAction {
 
     private:
     std::vector<G4String> fSDName;
+};
 
-}
 #endif

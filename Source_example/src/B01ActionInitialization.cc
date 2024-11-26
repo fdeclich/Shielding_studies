@@ -33,6 +33,7 @@
 
 #include "B01PrimaryGeneratorAction.hh"
 #include "B01RunAction.hh"
+#include "B01EventAction.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
