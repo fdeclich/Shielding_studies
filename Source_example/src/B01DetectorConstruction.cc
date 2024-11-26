@@ -54,6 +54,7 @@
 #include "G4PSNofCollision.hh"
 #include "G4PSPopulation.hh"
 #include "G4PSTrackCounter.hh"
+#include "G4PSTermination.hh"
 #include "G4PSTrackLength.hh"
 #include "G4SDManager.hh"
 #include "G4SDParticleFilter.hh"
@@ -202,7 +203,7 @@ G4VPhysicalVolume* B01DetectorConstruction::Construct()
   // world solid
 
   G4double innerRadiusCylinder = 0 * cm;
-  G4double outerRadiusCylinder = 100 * cm;
+  G4double outerRadiusCylinder = 200 * cm;
   G4double heightCylinder = 68.635 * cm;
   G4double startAngleCylinder = 0 * deg;
   G4double spanningAngleCylinder = 360 * deg;
@@ -214,12 +215,9 @@ G4VPhysicalVolume* B01DetectorConstruction::Construct()
 
   G4LogicalVolume* worldCylinder_log =
     new G4LogicalVolume(worldCylinder, Galactic, "worldCylinder_log");
-  fLogicalVolumeVector.push_back(worldCylinder_log);
 
   name = "shieldWorld";
   fWorldVolume = new G4PVPlacement(0, G4ThreeVector(0, 0, 0), worldCylinder_log, name, 0, false, 0);
-
-  fPhysicalVolumeVector.push_back(fWorldVolume);
 
   //Creating a struct to collect all the data
   struct shieldLayer_t {
@@ -290,8 +288,6 @@ G4VIStore* B01DetectorConstruction::CreateImportanceStore()
                 RunMustBeAborted, "no physical volumes created yet!");
   }
 
-  fWorldVolume = fPhysicalVolumeVector[0];
-
   // creating and filling the importance store
 
   G4IStore* istore = G4IStore::GetInstance();
@@ -299,23 +295,20 @@ G4VIStore* B01DetectorConstruction::CreateImportanceStore()
   G4int n = 0;
   G4double imp = 1;
   istore->AddImportanceGeometryCell(1, *fWorldVolume);
-  for (std::vector<G4VPhysicalVolume*>::iterator it = fPhysicalVolumeVector.begin();
-       it != fPhysicalVolumeVector.end() - 1; it++)
+  for (auto pv : fPhysicalVolumeVector)
   {
-    if (*it != fWorldVolume) {
-      //imp = std::pow(2., n++);
-      n++;
-      G4cout << "Going to assign importance: " << imp << ", to volume: " << (*it)->GetName()
-             << " replica nr: " << n << G4endl;
-      istore->AddImportanceGeometryCell(imp, *(*it), n);
-    }
+    //imp = std::pow(2., n++);
+    n++;
+    G4cout << "Going to assign importance: " << imp << ", to volume: " << pv->GetName()
+      << " replica nr: " << n << G4endl;
+    istore->AddImportanceGeometryCell(imp, *pv, n);
   }
 
   // the remaining part pf the geometry (rest) gets the same
   // importance as the last conrete cell
   //
-  istore->AddImportanceGeometryCell(imp, *(fPhysicalVolumeVector[fPhysicalVolumeVector.size() - 1]),
-                                    ++n);
+  //istore->AddImportanceGeometryCell(imp, *(fPhysicalVolumeVector[fPhysicalVolumeVector.size() - 1]),
+                                    //++n);
 
   return istore;
 }
@@ -328,8 +321,6 @@ G4VWeightWindowStore* B01DetectorConstruction::CreateWeightWindowStore()
     G4Exception("B01DetectorConstruction::CreateWeightWindowStore", "exampleB01_0002",
                 RunMustBeAborted, "no physical volumes created yet!");
   }
-
-  fWorldVolume = fPhysicalVolumeVector[0];
 
   // creating and filling the weight window store
 
@@ -349,18 +340,15 @@ G4VWeightWindowStore* B01DetectorConstruction::CreateWeightWindowStore()
   G4GeometryCell gWorldCell(*fWorldVolume, 0);
   wwstore->AddLowerWeights(gWorldCell, lowerWeights);
 
-  for (std::vector<G4VPhysicalVolume*>::iterator it = fPhysicalVolumeVector.begin();
-       it != fPhysicalVolumeVector.end() - 1; it++)
+  for (auto pv : fPhysicalVolumeVector)
   {
-    if (*it != fWorldVolume) {
-      lowerWeight = 1. / std::pow(2., n++);
-      G4cout << "Going to assign lower weight: " << lowerWeight
-             << ", to volume: " << (*it)->GetName() << G4endl;
-      G4GeometryCell gCell(*(*it), n);
-      lowerWeights.clear();
-      lowerWeights.push_back(lowerWeight);
-      wwstore->AddLowerWeights(gCell, lowerWeights);
-    }
+    lowerWeight = 1. / std::pow(2., n++);
+    G4cout << "Going to assign lower weight: " << lowerWeight
+      << ", to volume: " << pv->GetName() << G4endl;
+    G4GeometryCell gCell(*pv, n);
+    lowerWeights.clear();
+    lowerWeights.push_back(lowerWeight);
+    wwstore->AddLowerWeights(gCell, lowerWeights);
   }
 
   // the remaining part pf the geometry (rest) gets the same
@@ -437,7 +425,6 @@ void B01DetectorConstruction::ConstructSDandField()
   for (std::vector<G4LogicalVolume*>::iterator it = fLogicalVolumeVector.begin();
        it != fLogicalVolumeVector.end(); it++)
   {
-    //      (*it)->SetSensitiveDetector(MFDet);
     SetSensitiveDetector((*it)->GetName(), MFDet);
   }
 

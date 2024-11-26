@@ -40,6 +40,9 @@
 #include "G4UnitsTable.hh"
 #include "G4AnalysisManager.hh"
 #include "G4VPhysicalVolume.hh"
+#include "G4SDManager.hh"
+#include "G4MultiFunctionalDetector.hh"
+#include "G4VPrimitiveScorer.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 //
@@ -101,18 +104,20 @@ void B01RunAction::BeginOfRunAction(const G4Run* aRun)
   auto Detector = (B01DetectorConstruction*)runmngr->GetUserDetectorConstruction();
   std::vector<G4VPhysicalVolume*>& pv_vec = Detector->GetPhysicalVolumeVector();
 
+  auto sdman = G4SDManager::GetSDMpointer();
+  auto mfd = (G4MultiFunctionalDetector*)sdman->FindSensitiveDetector("ConcreteSD");
+  const int n_scorers = mfd->GetNumberOfPrimitives(); 
+
   analysisManager->CreateNtuple("ShieldingSD", "ShieldingSD");
   for (int i = 0; i < pv_vec.size(); i++) {
     G4String vol_name = pv_vec[i]->GetName();
-    analysisManager->CreateNtupleDColumn(vol_name);
-    analysisManager->CreateNtupleDColumn(vol_name + "_Collisions");
-    analysisManager->CreateNtupleDColumn(vol_name + "_Collisions_Weighted");
-    analysisManager->CreateNtupleDColumn(vol_name + "_Population");
-    analysisManager->CreateNtupleDColumn(vol_name + "_TrackEnter");
-    analysisManager->CreateNtupleDColumn(vol_name + "_Termination_Weighted");
+    for (int j = 0; j < n_scorers; j++) {
+      G4String scorer_name = mfd->GetPrimitive(j)->GetName();
+      G4String full_name = vol_name + "_" + scorer_name;
+      analysisManager->CreateNtupleDColumn(full_name);
+    }
   }
   analysisManager->FinishNtuple(); 
-
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -129,12 +134,10 @@ void B01RunAction::EndOfRunAction(const G4Run* aRun)
   //---
   G4RunManager* mgr = G4RunManager::GetRunManager();
   //
+  B01DetectorConstruction* detector = (B01DetectorConstruction*)mgr->GetUserDetectorConstruction();
+  const std::vector<G4VPhysicalVolume*>& pv_vec = detector->GetPhysicalVolumeVector();
 
   for (G4int i = 0; i < (G4int)fSDName.size(); i++) {
-    const G4VUserDetectorConstruction* vdet = mgr->GetUserDetectorConstruction();
-    B01DetectorConstruction* bdet = (B01DetectorConstruction*)vdet;
-    //
-
     //---------------------------------------------
     // Dump accumulated quantities for this RUN.
     //  (Display only central region of x-y plane)
@@ -152,12 +155,8 @@ void B01RunAction::EndOfRunAction(const G4Run* aRun)
     G4THitsMap<G4double>* CollWeight = b01Run->GetHitsMap(fSDName[i] + "/CollWeight");
     G4THitsMap<G4double>* Population = b01Run->GetHitsMap(fSDName[i] + "/Population");
     G4THitsMap<G4double>* TrackEnter = b01Run->GetHitsMap(fSDName[i] + "/TrackEnter");
-    G4THitsMap<G4double>* SL = b01Run->GetHitsMap(fSDName[i] + "/SL");
-    G4THitsMap<G4double>* SLW = b01Run->GetHitsMap(fSDName[i] + "/SLW");
-    G4THitsMap<G4double>* SLWE = b01Run->GetHitsMap(fSDName[i] + "/SLWE");
-    G4THitsMap<G4double>* SLW_V = b01Run->GetHitsMap(fSDName[i] + "/SLW_V");
-    G4THitsMap<G4double>* SLWE_V = b01Run->GetHitsMap(fSDName[i] + "/SLWE_V");
-
+    G4THitsMap<G4double>* Termination = b01Run->GetHitsMap(fSDName[i] + "/Termination_W");
+ 
     if (IsMaster()) {
       G4cout << "\n--------------------End of Global Run-----------------------" << G4endl;
       G4cout << " Number of event processed : " << aRun->GetNumberOfEvent() << G4endl;
@@ -173,49 +172,27 @@ void B01RunAction::EndOfRunAction(const G4Run* aRun)
     std::ostream* myout = &G4cout;
     PrintHeader(myout);
 
-    for (G4int iz = 0; iz < 20; iz++) {
-      G4double* SumCollisions = (*Collisions)[iz];
-      G4double* SumCollWeight = (*CollWeight)[iz];
-      G4double* Populations = (*Population)[iz];
-      G4double* TrackEnters = (*TrackEnter)[iz];
-      G4double* SLs = (*SL)[iz];
-      G4double* SLWs = (*SLW)[iz];
-      G4double* SLWEs = (*SLWE)[iz];
-      G4double* SLW_Vs = (*SLW_V)[iz];
-      G4double* SLWE_Vs = (*SLWE_V)[iz];
+    for (size_t iz = 0; iz < pv_vec.size(); iz++) {
+      G4double* SumCollisions = (*Collisions)[iz+1];
+      G4double* SumCollWeight = (*CollWeight)[iz+1];
+      G4double* Populations = (*Population)[iz+1];
+      G4double* TrackEnters = (*TrackEnter)[iz+1];
+      G4double* Terminations = (*Termination)[iz+1];  
       if (!SumCollisions) SumCollisions = new G4double(0.0);
       if (!SumCollWeight) SumCollWeight = new G4double(0.0);
       if (!Populations) Populations = new G4double(0.0);
       if (!TrackEnters) TrackEnters = new G4double(0.0);
-      if (!SLs) SLs = new G4double(0.0);
-      if (!SLWs) SLWs = new G4double(0.0);
-      if (!SLWEs) SLWEs = new G4double(0.0);
-      if (!SLW_Vs) SLW_Vs = new G4double(0.0);
-      if (!SLWE_Vs) SLWE_Vs = new G4double(0.0);
-      G4double NumWeightedEnergy = 0.0;
-      G4double FluxWeightedEnergy = 0.0;
-      G4double AverageTrackWeight = 0.0;
-      if (*SLW_Vs != 0.) NumWeightedEnergy = (*SLWE_Vs) / (*SLW_Vs);
-      if (*SLWs != 0.) FluxWeightedEnergy = (*SLWEs) / (*SLWs);
-      if (*SLs != 0.) AverageTrackWeight = (*SLWs) / (*SLs);
-      G4String cname = bdet->GetCellName(iz);
-      G4cout << std::setw(fFieldValue) << cname << " |" << std::setw(fFieldValue) << (*TrackEnters)
-             << " |" << std::setw(fFieldValue) << (*Populations) << " |" << std::setw(fFieldValue)
-             << (*SumCollisions) << " |" << std::setw(fFieldValue) << (*SumCollWeight) << " |"
-             << std::setw(fFieldValue) << NumWeightedEnergy << " |" << std::setw(fFieldValue)
-             << FluxWeightedEnergy << " |" << std::setw(fFieldValue) << AverageTrackWeight << " |"
-             << std::setw(fFieldValue) << (*SLs) << " |" << std::setw(fFieldValue) << (*SLWs)
-             << " |" << std::setw(fFieldValue) << (*SLW_Vs) << " |" << std::setw(fFieldValue)
-             << (*SLWEs) << " |" << std::setw(fFieldValue) << (*SLWE_Vs) << " |" << G4endl;
-
-
-      if (iz == 1 || iz == 2) {
-        analysisManager->FillNtupleDColumn(iz - 1, *SumCollisions);
-      }
+      if (!Terminations) Terminations = new G4double(0.0);
+      G4String cname = detector->GetCellName(iz);
+      G4cout << std::setw(fFieldValue) << cname 
+        << " |" << std::setw(fFieldValue) << (*SumCollisions)
+        << " |" << std::setw(fFieldValue) << (*SumCollWeight) 
+        << " |" << std::setw(fFieldValue) << (*Populations) 
+        << " |" << std::setw(fFieldValue) << (*TrackEnters)
+        << " |" << std::setw(fFieldValue) << (*Terminations) 
+        << " |" << G4endl; 
     }
     G4cout << "=============================================" << G4endl;
-
-    analysisManager->AddNtupleRow();
   }
 
   analysisManager->Write();
@@ -227,18 +204,11 @@ void B01RunAction::EndOfRunAction(const G4Run* aRun)
 void B01RunAction::PrintHeader(std::ostream* out)
 {
   std::vector<G4String> vecScoreName;
-  vecScoreName.push_back("Tr.Entering");
-  vecScoreName.push_back("Population");
   vecScoreName.push_back("Collisions");
   vecScoreName.push_back("Coll*WGT");
-  vecScoreName.push_back("NumWGTedE");
-  vecScoreName.push_back("FluxWGTedE");
-  vecScoreName.push_back("Av.Tr.WGT");
-  vecScoreName.push_back("SL");
-  vecScoreName.push_back("SLW");
-  vecScoreName.push_back("SLW_v");
-  vecScoreName.push_back("SLWE");
-  vecScoreName.push_back("SLWE_v");
+  vecScoreName.push_back("Population");
+  vecScoreName.push_back("Tr.Entering");
+  vecScoreName.push_back("Terminations");
 
   // head line
   //   std::string vname;
