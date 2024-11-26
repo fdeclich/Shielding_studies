@@ -140,6 +140,7 @@ G4VPhysicalVolume* B01DetectorConstruction::Construct()
   G4Material* cellulose = manager->FindOrBuildMaterial("G4_CELLULOSE_BUTYRATE");
   G4Material* alluminium = manager->FindOrBuildMaterial("G4_ALUMINUM_OXIDE");
   G4Material* polyethilene = manager->FindOrBuildMaterial("G4_POLYETHYLENE");
+  G4Material* water = manager->FindOrBuildMaterial("G4_WATER");
 
   G4Material* lignine = new G4Material("Lignine", 1.40 * g / cm3, 6);  
   lignine->AddElement(elC, 18);
@@ -202,7 +203,7 @@ G4VPhysicalVolume* B01DetectorConstruction::Construct()
 
   G4double innerRadiusCylinder = 0 * cm;
   G4double outerRadiusCylinder = 100 * cm;
-  G4double heightCylinder = 53.635 * cm;
+  G4double heightCylinder = 68.635 * cm;
   G4double startAngleCylinder = 0 * deg;
   G4double spanningAngleCylinder = 360 * deg;
 
@@ -231,6 +232,7 @@ G4VPhysicalVolume* B01DetectorConstruction::Construct()
   };
 
   std::vector<shieldLayer_t> layers;
+  layers.emplace_back(15 * cm, water, G4Colour(0, 0, 0.9), "water");
   layers.emplace_back(1.5 * cm, steel, G4Colour(0.55, 0.5, 0.65), "steel0");
   layers.emplace_back(.5 * cm, plywood, G4Colour(0.5, 0.35, 0.25), "plywood0");
   layers.emplace_back(5 * cm, BoratedPolyethilene, G4Colour(0.3, 1.0, 0.0), "borpol0");
@@ -249,13 +251,13 @@ G4VPhysicalVolume* B01DetectorConstruction::Construct()
   //Outer frame
   G4double innerRadiusShield = 0 * cm;
   G4double outerRadiusShield = 100 * cm;
-  G4double heightShield = 53.635 * cm;
+  G4double heightShield = 68.635 * cm;
   G4double startAngleShield = 0 * deg;
   G4double spanningAngleShield = 360 * deg;
 
   pos_x = 0 * cm;
   pos_y = 0 * cm;
-  G4double startz = -53.635 * cm;
+  G4double startz = -68.635 * cm;
   pos_z = startz;
   for (int i=0; i < layers.size(); i++) {
     auto &l=layers.at(i);
@@ -301,7 +303,7 @@ G4VIStore* B01DetectorConstruction::CreateImportanceStore()
        it != fPhysicalVolumeVector.end() - 1; it++)
   {
     if (*it != fWorldVolume) {
-      imp = std::pow(2., n++);
+      //mp = std::pow(2., n++);
       G4cout << "Going to assign importance: " << imp << ", to volume: " << (*it)->GetName()
              << G4endl;
       istore->AddImportanceGeometryCell(imp, *(*it), n);
@@ -474,6 +476,10 @@ void B01DetectorConstruction::ConstructSDandField()
   scorer8->MultiplyKineticEnergy(true);
   scorer8->DivideByVelocity(true);
   MFDet->RegisterPrimitive(scorer8);
+
+  G4PSTermination* scorer9 = new G4PSTermination (psName = "Termination_W");
+  scorer9->Weighted(true);
+  MFDet->RegisterPrimitive(scorer9);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
