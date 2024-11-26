@@ -273,7 +273,7 @@ G4VPhysicalVolume* B01DetectorConstruction::Construct()
       pos_z= pos_z + l.thickness + layers.at(i-1).thickness;
     }
     G4VPhysicalVolume* pvol = new G4PVPlacement(0, G4ThreeVector(pos_x, pos_y, pos_z), Logic,
-                                                l.vname + "_PV", worldCylinder_log, false, i, true);
+                                                l.vname + "_PV", worldCylinder_log, false, i+1, true);
     fPhysicalVolumeVector.push_back(pvol);
   };
   SetSensitive();
@@ -303,9 +303,10 @@ G4VIStore* B01DetectorConstruction::CreateImportanceStore()
        it != fPhysicalVolumeVector.end() - 1; it++)
   {
     if (*it != fWorldVolume) {
-      //mp = std::pow(2., n++);
+      //imp = std::pow(2., n++);
+      n++;
       G4cout << "Going to assign importance: " << imp << ", to volume: " << (*it)->GetName()
-             << G4endl;
+             << " replica nr: " << n << G4endl;
       istore->AddImportanceGeometryCell(imp, *(*it), n);
     }
   }
