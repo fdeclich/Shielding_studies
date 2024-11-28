@@ -14,7 +14,11 @@ B01EventAction::~B01EventAction() {
 
 void B01EventAction::BeginOfEventAction(const G4Event*) {
     G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
-    analysisManager->AddNtupleRow();
+    G4int ntuples = analysisManager->GetNofNtuples();
+    for (int i =0; i<ntuples; i++) {
+      analysisManager->AddNtupleRow(i);
+    }
+    
 }
 
 void B01EventAction::EndOfEventAction(const G4Event* aEvent) {
@@ -36,8 +40,9 @@ void B01EventAction::EndOfEventAction(const G4Event* aEvent) {
       const G4int& volume_copyNr = hit.first;
       const G4double* val = hit.second; 
 
-      const G4int column_idx = Ncol * (volume_copyNr - 1) + EvtMap->GetColID();
-      analysisManager->FillNtupleDColumn(column_idx, *val);
+      //const G4int column_idx = Ncol * (volume_copyNr - 1) + EvtMap->GetColID();
+      const G4int column_idx = EvtMap->GetColID();
+      analysisManager->FillNtupleDColumn(volume_copyNr, column_idx, *val);
     }
   }
 

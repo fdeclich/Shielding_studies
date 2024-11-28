@@ -108,16 +108,22 @@ void B01RunAction::BeginOfRunAction(const G4Run* aRun)
   auto mfd = (G4MultiFunctionalDetector*)sdman->FindSensitiveDetector("ConcreteSD");
   const int n_scorers = mfd->GetNumberOfPrimitives(); 
 
-  analysisManager->CreateNtuple("ShieldingSD", "ShieldingSD");
+  //Creating ntuple to record the energy spectrum or other infos
+  analysisManager->CreateNtuple("Primary", "Primary");
+  analysisManager->CreateNtupleDColumn("Energy");
+  analysisManager->FinishNtuple();
+
+  //Create ntuples for every volume
   for (int i = 0; i < pv_vec.size(); i++) {
     G4String vol_name = pv_vec[i]->GetName();
+    analysisManager->CreateNtuple("Shielding_" + vol_name, "Shielding_" + vol_name);
     for (int j = 0; j < n_scorers; j++) {
       G4String scorer_name = mfd->GetPrimitive(j)->GetName();
-      G4String full_name = vol_name + "_" + scorer_name;
-      analysisManager->CreateNtupleDColumn(full_name);
+      //G4String full_name = vol_name + "_" + scorer_name;
+      analysisManager->CreateNtupleDColumn(scorer_name);
     }
-  }
-  analysisManager->FinishNtuple(); 
+    analysisManager->FinishNtuple();
+  } 
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -156,6 +162,7 @@ void B01RunAction::EndOfRunAction(const G4Run* aRun)
     G4THitsMap<G4double>* Population = b01Run->GetHitsMap(fSDName[i] + "/Population");
     G4THitsMap<G4double>* TrackEnter = b01Run->GetHitsMap(fSDName[i] + "/TrackEnter");
     G4THitsMap<G4double>* Termination = b01Run->GetHitsMap(fSDName[i] + "/Termination_W");
+    G4THitsMap<G4double>* Energy_Deposit = b01Run->GetHitsMap(fSDName[i] + "/Energy_Deposit");
  
     if (IsMaster()) {
       G4cout << "\n--------------------End of Global Run-----------------------" << G4endl;
@@ -177,12 +184,14 @@ void B01RunAction::EndOfRunAction(const G4Run* aRun)
       G4double* SumCollWeight = (*CollWeight)[iz+1];
       G4double* Populations = (*Population)[iz+1];
       G4double* TrackEnters = (*TrackEnter)[iz+1];
-      G4double* Terminations = (*Termination)[iz+1];  
+      G4double* Terminations = (*Termination)[iz+1];
+      G4double* En_Deposits = (*Energy_Deposit)[iz+1];  
       if (!SumCollisions) SumCollisions = new G4double(0.0);
       if (!SumCollWeight) SumCollWeight = new G4double(0.0);
       if (!Populations) Populations = new G4double(0.0);
       if (!TrackEnters) TrackEnters = new G4double(0.0);
       if (!Terminations) Terminations = new G4double(0.0);
+      if (!En_Deposits) En_Deposits = new G4double(0.0);
       G4String cname = detector->GetCellName(iz);
       G4cout << std::setw(fFieldValue) << cname 
         << " |" << std::setw(fFieldValue) << (*SumCollisions)
@@ -190,6 +199,7 @@ void B01RunAction::EndOfRunAction(const G4Run* aRun)
         << " |" << std::setw(fFieldValue) << (*Populations) 
         << " |" << std::setw(fFieldValue) << (*TrackEnters)
         << " |" << std::setw(fFieldValue) << (*Terminations) 
+        << " |" << std::setw(fFieldValue) << (*En_Deposits)
         << " |" << G4endl; 
     }
     G4cout << "=============================================" << G4endl;
@@ -209,6 +219,7 @@ void B01RunAction::PrintHeader(std::ostream* out)
   vecScoreName.push_back("Population");
   vecScoreName.push_back("Tr.Entering");
   vecScoreName.push_back("Terminations");
+  vecScoreName.push_back("En_Deposits");
 
   // head line
   //   std::string vname;

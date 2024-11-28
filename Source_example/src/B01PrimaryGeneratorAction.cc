@@ -37,6 +37,7 @@
 #include "G4SystemOfUnits.hh"
 #include "G4ThreeVector.hh"
 #include "globals.hh"
+#include "G4AnalysisManager.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -63,6 +64,8 @@ B01PrimaryGeneratorAction::~B01PrimaryGeneratorAction()
 void B01PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
   fParticleGun->GeneratePrimaryVertex(anEvent);
+  G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
+  analysisManager->FillNtupleDColumn(0, 0, fParticleGun->GetParticleEnergy());
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

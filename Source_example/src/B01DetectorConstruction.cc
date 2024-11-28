@@ -58,6 +58,7 @@
 #include "G4PSTrackLength.hh"
 #include "G4SDManager.hh"
 #include "G4SDParticleFilter.hh"
+#include "G4PSEnergyDeposit.hh"
 
 // for importance biasing
 #include "G4IStore.hh"
@@ -445,6 +446,9 @@ void B01DetectorConstruction::ConstructSDandField()
   G4PSTermination* scorer4 = new G4PSTermination (psName = "Termination_W");
   scorer4->Weighted(true);
   MFDet->RegisterPrimitive(scorer4);
+
+  G4PSEnergyDeposit* scorer5 = new G4PSEnergyDeposit (psName = "Energy_Deposit");
+  MFDet->RegisterPrimitive(scorer5);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
