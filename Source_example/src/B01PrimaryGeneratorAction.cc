@@ -38,34 +38,39 @@
 #include "G4ThreeVector.hh"
 #include "globals.hh"
 #include "G4AnalysisManager.hh"
+#include "G4GeneralParticleSource.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 B01PrimaryGeneratorAction::B01PrimaryGeneratorAction()
-  : G4VUserPrimaryGeneratorAction(), fParticleGun(0)
-{
+  : G4VUserPrimaryGeneratorAction(), fParticleSource(nullptr)
+
+/*{
   G4int n_particle = 1;
   fParticleGun = new G4ParticleGun(n_particle);
   fParticleGun->SetParticleDefinition(G4Neutron::NeutronDefinition());
   fParticleGun->SetParticleEnergy(10.0 * MeV);
   fParticleGun->SetParticlePosition(G4ThreeVector(0.0, 0.0, -90.0005 * cm));
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0.0, 0.0, 1.0));
+}*/
+{
+  fParticleSource = new G4GeneralParticleSource();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 B01PrimaryGeneratorAction::~B01PrimaryGeneratorAction()
 {
-  delete fParticleGun;
+  delete fParticleSource;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void B01PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
-  fParticleGun->GeneratePrimaryVertex(anEvent);
+  fParticleSource->GeneratePrimaryVertex(anEvent);
   G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
-  analysisManager->FillNtupleDColumn(0, 0, fParticleGun->GetParticleEnergy());
+  analysisManager->FillNtupleDColumn(0, 0, fParticleSource->GetParticleEnergy());
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
