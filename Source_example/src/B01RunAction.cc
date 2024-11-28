@@ -160,6 +160,7 @@ void B01RunAction::EndOfRunAction(const G4Run* aRun)
     G4THitsMap<G4double>* Collisions = b01Run->GetHitsMap(fSDName[i] + "/Collisions");
     G4THitsMap<G4double>* CollWeight = b01Run->GetHitsMap(fSDName[i] + "/CollWeight");
     G4THitsMap<G4double>* Population = b01Run->GetHitsMap(fSDName[i] + "/Population");
+    G4THitsMap<G4double>* PopWeight = b01Run->GetHitsMap(fSDName[i] + "/Population_W");
     G4THitsMap<G4double>* TrackEnter = b01Run->GetHitsMap(fSDName[i] + "/TrackEnter");
     G4THitsMap<G4double>* Termination = b01Run->GetHitsMap(fSDName[i] + "/Termination_W");
     G4THitsMap<G4double>* Energy_Deposit = b01Run->GetHitsMap(fSDName[i] + "/Energy_Deposit");
@@ -183,6 +184,7 @@ void B01RunAction::EndOfRunAction(const G4Run* aRun)
       G4double* SumCollisions = (*Collisions)[iz+1];
       G4double* SumCollWeight = (*CollWeight)[iz+1];
       G4double* Populations = (*Population)[iz+1];
+      G4double* PopulationsWeighted = (*PopWeight)[iz+1];
       G4double* TrackEnters = (*TrackEnter)[iz+1];
       G4double* Terminations = (*Termination)[iz+1];
       G4double* En_Deposits = (*Energy_Deposit)[iz+1];  
@@ -197,6 +199,7 @@ void B01RunAction::EndOfRunAction(const G4Run* aRun)
         << " |" << std::setw(fFieldValue) << (*SumCollisions)
         << " |" << std::setw(fFieldValue) << (*SumCollWeight) 
         << " |" << std::setw(fFieldValue) << (*Populations) 
+        << " |" << std::setw(fFieldValue) << (*PopulationsWeighted)
         << " |" << std::setw(fFieldValue) << (*TrackEnters)
         << " |" << std::setw(fFieldValue) << (*Terminations) 
         << " |" << std::setw(fFieldValue) << (*En_Deposits)
@@ -217,6 +220,7 @@ void B01RunAction::PrintHeader(std::ostream* out)
   vecScoreName.push_back("Collisions");
   vecScoreName.push_back("Coll*WGT");
   vecScoreName.push_back("Population");
+  vecScoreName.push_back("PopulationsWeighted");
   vecScoreName.push_back("Tr.Entering");
   vecScoreName.push_back("Terminations");
   vecScoreName.push_back("En_Deposits");

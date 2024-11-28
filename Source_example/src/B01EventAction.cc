@@ -27,7 +27,6 @@ void B01EventAction::EndOfEventAction(const G4Event* aEvent) {
   if (!HCE) return;
 
   const G4int Ncol = HCE->GetNumberOfCollections();
-
   for (G4int i = 0; i < Ncol; i++) {  // Loop over HitsCollection
     G4THitsMap<G4double>* EvtMap = 0;
     EvtMap = (G4THitsMap<G4double>*)(HCE->GetHC(i));
@@ -45,7 +44,6 @@ void B01EventAction::EndOfEventAction(const G4Event* aEvent) {
       analysisManager->FillNtupleDColumn(volume_copyNr, column_idx, *val);
     }
   }
-
   return;
 }
 

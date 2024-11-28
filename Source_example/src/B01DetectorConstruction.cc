@@ -296,21 +296,20 @@ G4VIStore* B01DetectorConstruction::CreateImportanceStore()
   G4int n = 0;
   G4double imp = 1;
   istore->AddImportanceGeometryCell(1, *fWorldVolume);
-  for (auto pv : fPhysicalVolumeVector)
-  {
-    //imp = std::pow(2., n++);
-    n++;
-    G4cout << "Going to assign importance: " << imp << ", to volume: " << pv->GetName()
-      << " replica nr: " << n << G4endl;
-    istore->AddImportanceGeometryCell(imp, *pv, n);
-  }
-
-  // the remaining part pf the geometry (rest) gets the same
-  // importance as the last conrete cell
-  //
-  //istore->AddImportanceGeometryCell(imp, *(fPhysicalVolumeVector[fPhysicalVolumeVector.size() - 1]),
-                                    //++n);
-
+  istore->AddImportanceGeometryCell(1, *fPhysicalVolumeVector[0], 1);
+  istore->AddImportanceGeometryCell(4.7, *fPhysicalVolumeVector[1], 2);
+  istore->AddImportanceGeometryCell(8.5, *fPhysicalVolumeVector[2], 3);
+  istore->AddImportanceGeometryCell(8.5, *fPhysicalVolumeVector[3], 4);
+  istore->AddImportanceGeometryCell(28.4, *fPhysicalVolumeVector[4], 5);
+  istore->AddImportanceGeometryCell(38.7, *fPhysicalVolumeVector[5], 6);
+  istore->AddImportanceGeometryCell(188, *fPhysicalVolumeVector[6], 7);
+  istore->AddImportanceGeometryCell(188, *fPhysicalVolumeVector[7], 8);
+  istore->AddImportanceGeometryCell(188, *fPhysicalVolumeVector[8], 9);
+  istore->AddImportanceGeometryCell(188, *fPhysicalVolumeVector[9], 10);
+  istore->AddImportanceGeometryCell(188, *fPhysicalVolumeVector[10], 11);
+  istore->AddImportanceGeometryCell(188, *fPhysicalVolumeVector[11], 12);
+  istore->AddImportanceGeometryCell(188, *fPhysicalVolumeVector[12], 13);
+  istore->AddImportanceGeometryCell(188, *fPhysicalVolumeVector[13], 14);
   return istore;
 }
 
@@ -440,15 +439,20 @@ void B01DetectorConstruction::ConstructSDandField()
   G4PSPopulation* scorer2 = new G4PSPopulation(psName = "Population");
   MFDet->RegisterPrimitive(scorer2);
 
-  G4PSTrackCounter* scorer3 = new G4PSTrackCounter(psName = "TrackEnter", fCurrent_In);
+  G4PSPopulation* scorer3 = new G4PSPopulation(psName = "Population_W");
+  scorer3->Weighted(true);
   MFDet->RegisterPrimitive(scorer3);
 
-  G4PSTermination* scorer4 = new G4PSTermination (psName = "Termination_W");
-  scorer4->Weighted(true);
+  G4PSTrackCounter* scorer4 = new G4PSTrackCounter(psName = "TrackEnter", fCurrent_In);
   MFDet->RegisterPrimitive(scorer4);
 
-  G4PSEnergyDeposit* scorer5 = new G4PSEnergyDeposit (psName = "Energy_Deposit");
+  G4PSTermination* scorer5 = new G4PSTermination (psName = "Termination_W");
+  scorer5->Weighted(true);
   MFDet->RegisterPrimitive(scorer5);
+
+  G4PSEnergyDeposit* scorer6 = new G4PSEnergyDeposit (psName = "Energy_Deposit");
+  MFDet->RegisterPrimitive(scorer6);
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
