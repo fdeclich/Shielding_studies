@@ -150,22 +150,21 @@ void tree_analysis (TString filename) {
         var_ste2 += pop_ste_2;
     }
     std::cout << "--------------Printing all the variables------------------------" << std::endl;
-    std::cout << "Water variable: " << var_water << std::endl;
-    std::cout << "First Steel variable: " << var_ste0 << std::endl;
-    std::cout << "First Plywood variable: " << var_ply0 << std::endl;
-    std::cout << "First Borated Polyethilene variable: " << var_borpol0 << std::endl;
-    std::cout << "Second Plywood variable: " << var_ply1 << std::endl;
-    std::cout << "First Polyurethane variable: " << var_poly0 << std::endl;
-    std::cout << "Third Plywood variable: " << var_ply2 << std::endl;
-    std::cout << "Second Steel variable: " << var_ste1 << std::endl;
-    std::cout << "Fourth Plywood variable: " << var_ply3 << std::endl;
-    std::cout << "Second Polyurethane variable: " << var_poly1 << std::endl;
-    std::cout << "Fifth Plywood variable: " << var_ply4 << std::endl;
-    std::cout << "Second Borated Polyethilene variable: " << var_borpol1 << std::endl;
-    std::cout << "Second Steel variable: " << var_ste1 << std::endl;
-    std::cout << "Third Steel variable: " << var_ste2 << std::endl;
-    std::cout << "Sixth Plywood variable: " << var_ply5 << std::endl;
-
+    std::cout << "#1 Water variable: " << var_water << std::endl;
+    std::cout << "#2 First Steel variable: " << var_ste0 << std::endl;
+    std::cout << "#3 First Plywood variable: " << var_ply0 << std::endl;
+    std::cout << "#4 First Borated Polyethilene variable: " << var_borpol0 << std::endl;
+    std::cout << "#5 Second Plywood variable: " << var_ply1 << std::endl;
+    std::cout << "#6 First Polyurethane variable: " << var_poly0 << std::endl;
+    std::cout << "#7 Third Plywood variable: " << var_ply2 << std::endl;
+    std::cout << "#8 Second Steel variable: " << var_ste1 << std::endl;
+    std::cout << "#9 Fourth Plywood variable: " << var_ply3 << std::endl;
+    std::cout << "#10 Second Polyurethane variable: " << var_poly1 << std::endl;
+    std::cout << "#11 Fifth Plywood variable: " << var_ply4 << std::endl;
+    std::cout << "#12 Second Borated Polyethilene variable: " << var_borpol1 << std::endl;
+    std::cout << "#13 Sixth Plywood variable: " << var_ply5 << std::endl;
+    std::cout << "#14 Third Steel variable: " << var_ste2 << std::endl;
+    
     //Drawing all of this
     c1->cd(1);
     hist_pop_water->GetXaxis()->SetTitle("Population");

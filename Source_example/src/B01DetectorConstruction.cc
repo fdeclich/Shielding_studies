@@ -301,15 +301,15 @@ G4VIStore* B01DetectorConstruction::CreateImportanceStore()
   istore->AddImportanceGeometryCell(8.5, *fPhysicalVolumeVector[2], 3);
   istore->AddImportanceGeometryCell(8.5, *fPhysicalVolumeVector[3], 4);
   istore->AddImportanceGeometryCell(28.4, *fPhysicalVolumeVector[4], 5);
-  istore->AddImportanceGeometryCell(38.7, *fPhysicalVolumeVector[5], 6);
-  istore->AddImportanceGeometryCell(188, *fPhysicalVolumeVector[6], 7);
-  istore->AddImportanceGeometryCell(188, *fPhysicalVolumeVector[7], 8);
-  istore->AddImportanceGeometryCell(188, *fPhysicalVolumeVector[8], 9);
-  istore->AddImportanceGeometryCell(188, *fPhysicalVolumeVector[9], 10);
-  istore->AddImportanceGeometryCell(188, *fPhysicalVolumeVector[10], 11);
-  istore->AddImportanceGeometryCell(188, *fPhysicalVolumeVector[11], 12);
-  istore->AddImportanceGeometryCell(188, *fPhysicalVolumeVector[12], 13);
-  istore->AddImportanceGeometryCell(188, *fPhysicalVolumeVector[13], 14);
+  istore->AddImportanceGeometryCell(28.4, *fPhysicalVolumeVector[5], 6);
+  istore->AddImportanceGeometryCell(42.5, *fPhysicalVolumeVector[6], 7);
+  istore->AddImportanceGeometryCell(42.5, *fPhysicalVolumeVector[7], 8);
+  istore->AddImportanceGeometryCell(45, *fPhysicalVolumeVector[8], 9);
+  istore->AddImportanceGeometryCell(45, *fPhysicalVolumeVector[9], 10);
+  istore->AddImportanceGeometryCell(65, *fPhysicalVolumeVector[10], 11);
+  istore->AddImportanceGeometryCell(65, *fPhysicalVolumeVector[11], 12);
+  istore->AddImportanceGeometryCell(175, *fPhysicalVolumeVector[12], 13);
+  istore->AddImportanceGeometryCell(180, *fPhysicalVolumeVector[13], 14);
   return istore;
 }
 
