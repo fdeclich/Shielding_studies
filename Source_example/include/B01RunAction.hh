@@ -40,6 +40,23 @@
 
 class G4Run;
 
+struct AbsEnergyRecord_t {
+  std::vector<double> fAbsEnergy;
+  std::vector<double> fTrackWeight; 
+  std::vector<int> fTrackID;
+
+  inline void reset() {
+    fAbsEnergy.clear();
+    fTrackWeight.clear();
+    fTrackID.clear();
+  }
+  inline void init() {
+    fAbsEnergy.reserve(100);
+    fTrackWeight.reserve(100);
+    fTrackID.reserve(100);
+  }
+};
+
 //=======================================================================
 // B01RunAction
 //
@@ -63,6 +80,7 @@ class B01RunAction : public G4UserRunAction
   public:
     void PrintHeader(std::ostream* out);
     std::string FillString(const std::string& name, char c, G4int n, G4bool back = true);
+    std::map<G4int, AbsEnergyRecord_t>& GetAbsEnergyRecords() { return fAbsEnergyRecords; }
 
   private:
     // Data member
@@ -70,6 +88,8 @@ class B01RunAction : public G4UserRunAction
     std::vector<G4String> fSDName;
     //  G4int fFieldName;
     G4int fFieldValue;
+    std::map<G4int, AbsEnergyRecord_t> fAbsEnergyRecords;
+
 };
 
 //

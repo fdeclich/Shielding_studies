@@ -121,6 +121,11 @@ void B01RunAction::BeginOfRunAction(const G4Run* aRun)
       //G4String full_name = vol_name + "_" + scorer_name;
       analysisManager->CreateNtupleDColumn(scorer_name);
     }
+
+    auto& record = fAbsEnergyRecords[i+1];
+    analysisManager->CreateNtupleDColumn("AbsEnergy", record.fAbsEnergy);
+    analysisManager->CreateNtupleDColumn("TrackWeight", record.fTrackWeight);
+    analysisManager->CreateNtupleIColumn("TrackID", record.fTrackID);
     analysisManager->FinishNtuple();
   } 
 }

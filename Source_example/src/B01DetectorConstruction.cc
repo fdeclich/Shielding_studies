@@ -30,6 +30,7 @@
 //
 
 #include "B01DetectorConstruction.hh"
+#include "B01AbsorberSD.hh"
 
 #include "G4Box.hh"
 #include "G4Colour.hh"
@@ -458,6 +459,16 @@ void B01DetectorConstruction::ConstructSDandField()
 
   G4PSEnergyDeposit* scorer6 = new G4PSEnergyDeposit (psName = "Energy_Deposit");
   MFDet->RegisterPrimitive(scorer6);
+
+
+  // Create a sensitive detector to record the energy spectrum of 
+  // particles entering the shielding layers
+  AbsorberSD* absorberSD = new AbsorberSD("absorberSD");
+  SDman->AddNewDetector(absorberSD);
+  for (auto &lv : fLogicalVolumeVector) {
+    SetSensitiveDetector(lv, absorberSD);
+  }
+
 
 }
 
