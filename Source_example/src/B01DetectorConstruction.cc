@@ -42,6 +42,7 @@
 #include "G4Tubs.hh"
 #include "G4Types.hh"
 #include "G4VisAttributes.hh"
+#include "G4GenericMessenger.hh"
 #include "globals.hh"
 //To use pre defined elements and materials
 #include "G4NistManager.hh"
@@ -71,7 +72,13 @@
 B01DetectorConstruction::B01DetectorConstruction()
   : G4VUserDetectorConstruction(), fLogicalVolumeVector(), fPhysicalVolumeVector()
 {
-  ;
+  fMsg = new G4GenericMessenger(this, "/detector/", "detector construction control");
+  fMsg->DeclareProperty("enableImportanceBiasing", fEnableImportanceBiasing,
+                        "Enable importance biasing for the geometry")
+        .SetGuidance("Enable or disable importance biasing.")
+        .SetDefaultValue("true");  // Valore di default
+
+  fMsg->DeclareMethod("createImportanceStore", &B01DetectorConstruction::CreateImportanceStore);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -290,26 +297,25 @@ G4VIStore* B01DetectorConstruction::CreateImportanceStore()
   }
 
   // creating and filling the importance store
-
   G4IStore* istore = G4IStore::GetInstance();
 
-  G4int n = 0;
-  G4double imp = 1;
   istore->AddImportanceGeometryCell(1, *fWorldVolume);
-  istore->AddImportanceGeometryCell(1, *fPhysicalVolumeVector[0], 1);
-  istore->AddImportanceGeometryCell(4.7, *fPhysicalVolumeVector[1], 2);
-  istore->AddImportanceGeometryCell(8.5, *fPhysicalVolumeVector[2], 3);
-  istore->AddImportanceGeometryCell(8.5, *fPhysicalVolumeVector[3], 4);
-  istore->AddImportanceGeometryCell(28.4, *fPhysicalVolumeVector[4], 5);
-  istore->AddImportanceGeometryCell(28.4, *fPhysicalVolumeVector[5], 6);
-  istore->AddImportanceGeometryCell(42.5, *fPhysicalVolumeVector[6], 7);
-  istore->AddImportanceGeometryCell(42.5, *fPhysicalVolumeVector[7], 8);
-  istore->AddImportanceGeometryCell(45, *fPhysicalVolumeVector[8], 9);
-  istore->AddImportanceGeometryCell(45, *fPhysicalVolumeVector[9], 10);
-  istore->AddImportanceGeometryCell(65, *fPhysicalVolumeVector[10], 11);
-  istore->AddImportanceGeometryCell(65, *fPhysicalVolumeVector[11], 12);
-  istore->AddImportanceGeometryCell(175, *fPhysicalVolumeVector[12], 13);
-  istore->AddImportanceGeometryCell(180, *fPhysicalVolumeVector[13], 14);
+  G4int n = 0;
+  G4int n_layers = fPhysicalVolumeVector.size();
+  std::vector<G4double> importance(n_layers);
+  importance = {1, 4.7, 8.5, 8.5, 28.4, 28.4, 42.5, 42.5, 45, 45, 65, 65, 175, 180};
+  G4int ipv = 1;
+  for (auto pv : fPhysicalVolumeVector)
+  {
+    G4double imp = 1.0; 
+    if (fEnableImportanceBiasing) {
+      imp = importance[n];
+    }
+    G4cout << "Going to assign importance: " << importance[n]
+      << ", to volume: " << pv->GetName() << G4endl;
+    istore->AddImportanceGeometryCell(imp, *pv, ipv);
+    ipv++;
+  }
   return istore;
 }
 

@@ -40,6 +40,7 @@ class G4VPhysicalVolume;
 class G4LogicalVolume;
 class G4VIStore;
 class G4VWeightWindowStore;
+class G4GenericMessenger;
 
 class B01DetectorConstruction : public G4VUserDetectorConstruction
 {
@@ -64,13 +65,19 @@ class B01DetectorConstruction : public G4VUserDetectorConstruction
 
     virtual void ConstructSDandField();
 
+    void EnableImportanceBiasing(bool enable) {fEnableImportanceBiasing = enable;}
+
+    void DisableImportanceBiasing() {fEnableImportanceBiasing = false;}
+
     inline std::vector<G4VPhysicalVolume*>& GetPhysicalVolumeVector() {return fPhysicalVolumeVector;} 
 
   private:
-    std::vector<G4LogicalVolume*> fLogicalVolumeVector;
-    std::vector<G4VPhysicalVolume*> fPhysicalVolumeVector;
+    bool fEnableImportanceBiasing = true;
+    G4GenericMessenger* fMsg = nullptr;
+    std::vector<G4LogicalVolume*> fLogicalVolumeVector = {};
+    std::vector<G4VPhysicalVolume*> fPhysicalVolumeVector = {};
+    G4VPhysicalVolume* fWorldVolume = {};
 
-    G4VPhysicalVolume* fWorldVolume;
 };
 
 #endif

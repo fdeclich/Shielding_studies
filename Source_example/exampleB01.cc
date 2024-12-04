@@ -128,14 +128,14 @@ int main(int argc, char** argv)
   B01ActionInitialization* actions = new B01ActionInitialization;
   runManager->SetUserInitialization(actions);
 
-  runManager->Initialize();
+  //runManager->Initialize();
   
-  if (mode == 0) {
-    detector->CreateImportanceStore();
-  }
-  else {
-    detector->CreateWeightWindowStore();
-  }
+  //if (mode == 0) {
+    //detector->CreateImportanceStore();
+  //}
+  //else {
+    //detector->CreateWeightWindowStore();
+  //}
   
   G4VisManager* visManager = new G4VisExecutive;
   visManager->Initialize();
