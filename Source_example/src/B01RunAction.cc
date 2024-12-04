@@ -64,6 +64,7 @@ B01RunAction::B01RunAction()
 
   G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
   analysisManager->SetVerboseLevel(1);
+  analysisManager->SetFileName("B01_output.root");
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -96,9 +97,7 @@ void B01RunAction::BeginOfRunAction(const G4Run* aRun)
   G4cout << "### Run " << aRun->GetRunID() << " start." << G4endl;
   
   G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
-  const G4int run_number = G4RunManager::GetRunManager()->GetCurrentRun()->GetRunID(); 
-  G4String filename = "B01" + std::to_string(run_number) + ".root";
-  analysisManager->OpenFile(filename);
+  analysisManager->OpenFile();
 
   G4RunManager* runmngr = G4RunManager::GetRunManager();
   auto Detector = (B01DetectorConstruction*)runmngr->GetUserDetectorConstruction();
