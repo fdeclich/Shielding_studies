@@ -316,6 +316,7 @@ G4VIStore* B01DetectorConstruction::CreateImportanceStore()
       << ", to volume: " << pv->GetName() << G4endl;
     istore->AddImportanceGeometryCell(imp, *pv, ipv);
     ipv++;
+    n++;
   }
   return istore;
 }
