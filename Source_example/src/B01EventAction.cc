@@ -27,7 +27,9 @@ void B01EventAction::BeginOfEventAction(const G4Event*) {
       record.second.reset();
       record.second.init();
     }
-    
+
+    //G4int ev_number = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
+    //printf("-------------------- Event %i ---------------------\n", ev_number);
 }
 
 void B01EventAction::EndOfEventAction(const G4Event* aEvent) {

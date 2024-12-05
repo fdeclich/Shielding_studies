@@ -74,7 +74,8 @@ G4bool AbsorberSD::ProcessHits(G4Step *aStep, G4TouchableHistory *)
     newHit->SetTrackID(aStep->GetTrack()->GetTrackID());
     newHit->SetAbsorberID(index);
 
-    newHit->Print();
+    //newHit->Print();
+    //getchar();
     fHitsCollection->insert(newHit);
   }
 

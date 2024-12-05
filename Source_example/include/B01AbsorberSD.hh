@@ -70,8 +70,11 @@ class AbsorberSD : public G4VSensitiveDetector
   public:
     AbsorberSD(G4String name);
     virtual ~AbsorberSD();
-    virtual void Initialize(G4HCofThisEvent* HCE);
-    virtual G4bool ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist);
+    void Initialize(G4HCofThisEvent* HCE) override;
+    G4bool ProcessHits(G4Step* aStep, G4TouchableHistory* ROhist) override;
+    void EndOfEvent(G4HCofThisEvent* HCE) override {
+      fCellTrackLogger.clear();
+    }
 
   private:
     G4int fHCID;
