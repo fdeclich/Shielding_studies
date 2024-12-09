@@ -180,8 +180,8 @@ std::vector<TH1D*> unbiased_hists(const TString file_list_path)
 void histos_compatibility (std::vector<TH1D*> biased, std::vector<TH1D*> unbiased) {
   std::vector <double_t> chis(biased.size());
   for (int i = 0; i < biased.size(); i++) {
-    chis[i] = unbiased[i]->Chi2Test(biased[i], "UW");
-    std::cout << "Chi2 compatibility test result for the " << i << " layer: " << chis[i] << std::endl;
+    chis[i] = unbiased[i]->Chi2Test(biased[i], "CHI2/NDF");
+    std::cout << "Chi2 compatibility test result for the " << i << " layer (Reduced chi2): " << chis[i] << std::endl;
   }
 }
 int main (int argc, char* argv[]) {
