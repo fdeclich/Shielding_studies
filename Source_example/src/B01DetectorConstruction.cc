@@ -312,7 +312,7 @@ G4VIStore* B01DetectorConstruction::CreateImportanceStore()
     if (fEnableImportanceBiasing) {
       imp = importance[n];
     }
-    G4cout << "Going to assign importance: " << importance[n]
+    G4cout << "Going to assign importance: " << imp
       << ", to volume: " << pv->GetName() << G4endl;
     istore->AddImportanceGeometryCell(imp, *pv, ipv);
     ipv++;

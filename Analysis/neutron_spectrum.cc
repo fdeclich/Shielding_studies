@@ -72,4 +72,3 @@ int neutron_spectrum(const TString file_path)
     
   return 0;
 }
-

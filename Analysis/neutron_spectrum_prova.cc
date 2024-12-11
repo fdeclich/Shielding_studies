@@ -6,6 +6,8 @@
 #include "TCanvas.h"
 #include "TH1D.h"
 #include "TChain.h"
+#include "TRatioPlot.h"
+#include "TLegend.h"
 
 struct TrkEvent_t {
   std::vector<double>* _energy = {}; 
@@ -85,6 +87,7 @@ std::vector<TH1D*> biased_hists(const TString file_list_path)
     }
   }
   //Creating canvas to show everything
+  /*
   TCanvas* canvas = new TCanvas("canvas", "Biased Histos Comparison", 1600, 1200);
   canvas->DivideSquare(layer_names.size());
   for (int i = 0; i < layer_names.size(); i++) {
@@ -93,7 +96,7 @@ std::vector<TH1D*> biased_hists(const TString file_list_path)
     biased_layer_hists[i]->Draw("HIST");
   }
   canvas->SaveAs("Biased Comparison Energy Weighted.png");
-  chains.clear();
+  chains.clear();*/
   return biased_layer_hists;
 }
 
@@ -164,6 +167,7 @@ std::vector<TH1D*> unbiased_hists(const TString file_list_path)
       i++; 
     }
   }
+  /*
   //Creating canvas to show everything
   TCanvas* canvas_unb = new TCanvas("canvas_unb", "Unbiased Histos Comparison", 1600, 1200);
   canvas_unb->DivideSquare(layer_names.size());
@@ -173,15 +177,33 @@ std::vector<TH1D*> unbiased_hists(const TString file_list_path)
     unbiased_layer_hists[i]->Draw("HIST");
   }
   canvas_unb->SaveAs("Unbiased Comparison Energy Weighted.png");
-  chains_unb.clear();
+  chains_unb.clear();*/
   return unbiased_layer_hists;
 }
 
 void histos_compatibility (std::vector<TH1D*> biased, std::vector<TH1D*> unbiased) {
   std::vector <double_t> chis(biased.size());
+  std::vector <TRatioPlot*> res(biased.size());
+  std::vector<TCanvas*> canvas(biased.size());
   for (int i = 0; i < biased.size(); i++) {
-    chis[i] = unbiased[i]->Chi2Test(biased[i], "CHI2/NDF");
-    std::cout << "Chi2 compatibility test result for the " << i << " layer (Reduced chi2): " << chis[i] << std::endl;
+    //canvas[i].Divide(1,2);
+    canvas[i] = new TCanvas(Form("Canvas_%d", i), "Comparison");
+    biased[i]->GetXaxis()->SetRange(2, unbiased[i]->GetNbinsX());
+    double n_entry_b = biased[i]->Integral(2, biased[i]->GetNbinsX());
+    double n_entry_u = unbiased[i]->Integral(2, unbiased[i]->GetNbinsX());
+    biased[i]->Scale(1/n_entry_b);
+    unbiased[i]->Scale(1/n_entry_u);
+    chis[i] = unbiased[i]->Chi2Test(biased[i], "WW");
+    res[i] = new TRatioPlot(unbiased[i], biased[i]);
+    unbiased[i]->SetLineColor(kRed);
+    res[i]->Draw();
+    res[i]->GetUpperPad()->cd();
+    TLegend* legend = new TLegend(0.15,0.7,0.4,0.85);
+    legend->AddEntry(biased[i], "Biased histo", "l");
+    legend->AddEntry(unbiased[i], "Unbiased histo", "l");
+    legend->Draw();
+    canvas[i]->SaveAs(Form ("../Images/Comparison_%d.png", i));
+    std::cout << "Chi2 compatibility test result for the " << i << " layer: " << chis[i] << std::endl;
   }
 }
 int main (int argc, char* argv[]) {

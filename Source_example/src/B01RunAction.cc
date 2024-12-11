@@ -195,6 +195,7 @@ void B01RunAction::EndOfRunAction(const G4Run* aRun)
       if (!SumCollisions) SumCollisions = new G4double(0.0);
       if (!SumCollWeight) SumCollWeight = new G4double(0.0);
       if (!Populations) Populations = new G4double(0.0);
+      if (!PopulationsWeighted) PopulationsWeighted = new G4double(0.0);
       if (!TrackEnters) TrackEnters = new G4double(0.0);
       if (!Terminations) Terminations = new G4double(0.0);
       if (!En_Deposits) En_Deposits = new G4double(0.0);
