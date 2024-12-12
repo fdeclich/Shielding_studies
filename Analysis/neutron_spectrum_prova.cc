@@ -86,17 +86,6 @@ std::vector<TH1D*> biased_hists(const TString file_list_path)
       i++; 
     }
   }
-  //Creating canvas to show everything
-  /*
-  TCanvas* canvas = new TCanvas("canvas", "Biased Histos Comparison", 1600, 1200);
-  canvas->DivideSquare(layer_names.size());
-  for (int i = 0; i < layer_names.size(); i++) {
-    canvas->cd(i+1);
-    biased_layer_hists[i]->SetLineColor(i+1);
-    biased_layer_hists[i]->Draw("HIST");
-  }
-  canvas->SaveAs("Biased Comparison Energy Weighted.png");
-  chains.clear();*/
   return biased_layer_hists;
 }
 
@@ -167,17 +156,6 @@ std::vector<TH1D*> unbiased_hists(const TString file_list_path)
       i++; 
     }
   }
-  /*
-  //Creating canvas to show everything
-  TCanvas* canvas_unb = new TCanvas("canvas_unb", "Unbiased Histos Comparison", 1600, 1200);
-  canvas_unb->DivideSquare(layer_names.size());
-  for (int i = 0; i < layer_names.size(); i++) {
-    canvas_unb->cd(i+1);
-    unbiased_layer_hists[i]->SetLineColor(i+1);
-    unbiased_layer_hists[i]->Draw("HIST");
-  }
-  canvas_unb->SaveAs("Unbiased Comparison Energy Weighted.png");
-  chains_unb.clear();*/
   return unbiased_layer_hists;
 }
 
