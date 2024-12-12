@@ -71,12 +71,15 @@ class B01DetectorConstruction : public G4VUserDetectorConstruction
 
     inline std::vector<G4VPhysicalVolume*>& GetPhysicalVolumeVector() {return fPhysicalVolumeVector;} 
 
+    inline void SetParticleName (G4String particleName) {fparticleName = particleName;}
+
   private:
     bool fEnableImportanceBiasing = true;
     G4GenericMessenger* fMsg = nullptr;
     std::vector<G4LogicalVolume*> fLogicalVolumeVector = {};
     std::vector<G4VPhysicalVolume*> fPhysicalVolumeVector = {};
     G4VPhysicalVolume* fWorldVolume = {};
+    G4String fparticleName = {};
 
 };
 

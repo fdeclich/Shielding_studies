@@ -82,20 +82,28 @@
 #include "G4VWeightWindowStore.hh"
 #include "G4WeightWindowAlgorithm.hh"
 
+#include <random>
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 int main(int argc, char** argv)
-{
+{ 
+  if (argc < 2) {
+    std::cerr << "First argument not found!";
+    return EXIT_FAILURE;
+  }
+  G4String particlename = argv[1];
+  G4String macroname = (argc > 2) ? argv[2] : "";
   G4int mode = 0;
-  if (argc > 1) mode = atoi(argv[1]);
+  if (argc > 2) mode = atoi(argv[2]);
 
   G4int numberOfEvents = 100;
-  G4long myseed = 345354;
+  G4long myseed = static_cast<G4long>(std::time(nullptr));
 
-  G4UIExecutive* ui = nullptr;
+  /*G4UIExecutive* ui = nullptr;
   if (argc == 1) {
     ui = new G4UIExecutive(argc, argv);
-  }
+  }*/
 
   auto* runManager = G4RunManagerFactory::CreateRunManager();
   runManager->SetNumberOfThreads(2);
@@ -106,8 +114,9 @@ int main(int argc, char** argv)
 
   // create the detector      ---------------------------
   B01DetectorConstruction* detector = new B01DetectorConstruction();
+  detector->SetParticleName(particlename);
   runManager->SetUserInitialization(detector);
-  G4GeometrySampler mgs(detector->GetWorldVolume(), "neutron");
+  G4GeometrySampler mgs(detector->GetWorldVolume(), particlename);
 
   G4VModularPhysicsList* physicsList = new FTFP_BERT;
   if (mode == 0) {
@@ -141,18 +150,19 @@ int main(int argc, char** argv)
   visManager->Initialize();
 
   G4UImanager* UImanager = G4UImanager::GetUIpointer();
-
-  if (!ui) {
-    // batch mode
-    G4String command = "/control/execute ";
-    G4String fileName = argv[1];
-    UImanager->ApplyCommand(command + fileName);
-  }
-  else {
+  G4UIExecutive* ui = nullptr;
+  if (macroname.empty()) {
     // interactive mode
+    ui = new G4UIExecutive(argc, argv);
     UImanager->ApplyCommand("/control/execute init_vis.mac");
     ui->SessionStart();
     delete ui;
+  }
+  else {
+    // batch mode
+    std::ifstream macroFile(macroname);
+    G4String command = "/control/execute ";
+    UImanager->ApplyCommand(command + macroname);
   }
 
   // open geometry for clean biasing stores clean-up

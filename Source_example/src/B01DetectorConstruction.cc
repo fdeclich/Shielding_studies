@@ -303,8 +303,16 @@ G4VIStore* B01DetectorConstruction::CreateImportanceStore()
   istore->AddImportanceGeometryCell(1, *fWorldVolume);
   G4int n = 0;
   G4int n_layers = fPhysicalVolumeVector.size();
-  std::vector<G4double> importance(n_layers);
-  importance = {1, 4.7, 8.5, 8.5, 28.4, 28.4, 42.5, 42.5, 45, 45, 65, 65, 175, 180};
+  std::vector<G4double> importance(n_layers, 1);
+  if (fparticleName == "neutron") {
+    importance = {1, 335, 740, 775, 5400, 5405, 10600, 10600, 10970, 11000, 20000, 20100, 110000, 117500};
+  }
+  else if (fparticleName == "gamma") {
+    importance = {1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+  }
+  else {
+    std::cout << "Importances not defined for this " << fparticleName << std::endl;
+  }
   G4int ipv = 1;
   for (auto pv : fPhysicalVolumeVector)
   {
@@ -424,11 +432,12 @@ void B01DetectorConstruction::ConstructSDandField()
   G4MultiFunctionalDetector* MFDet = new G4MultiFunctionalDetector(concreteSDname);
   SDman->AddNewDetector(MFDet);  // Register SD to SDManager
 
-  G4String fltName, particleName;
-  G4SDParticleFilter* neutronFilter =
-    new G4SDParticleFilter(fltName = "neutronFilter", particleName = "neutron");
+  G4String fltName;
+  G4String particleName = fparticleName;
+  G4SDParticleFilter* particleFilter =
+    new G4SDParticleFilter(fltName = "particleFilter", particleName);
 
-  MFDet->SetFilter(neutronFilter);
+  MFDet->SetFilter(particleFilter);
 
   for (std::vector<G4LogicalVolume*>::iterator it = fLogicalVolumeVector.begin();
        it != fLogicalVolumeVector.end(); it++)
