@@ -308,7 +308,7 @@ G4VIStore* B01DetectorConstruction::CreateImportanceStore()
     importance = {1, 335, 740, 775, 5400, 5405, 10600, 10600, 10970, 11000, 20000, 20100, 110000, 117500};
   }
   else if (fparticleName == "gamma") {
-    importance = {1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+    importance = {1, 2, 6, 6, 7.8, 7.8, 9.2, 9.2, 10.2, 10.2, 12.4, 12.4, 16, 16};
   }
   else {
     std::cout << "Importances not defined for this " << fparticleName << std::endl;
