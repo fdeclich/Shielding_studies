@@ -15,6 +15,8 @@
 #include "G4Step.hh"
 #include "G4TrackLogger.hh"
 #include "G4Allocator.hh"
+#include "G4ParticleDefinition.hh"
+#include "G4ParticleTable.hh"
 
 
 class AbsorberHit : public G4VHit
@@ -75,11 +77,13 @@ class AbsorberSD : public G4VSensitiveDetector
     void EndOfEvent(G4HCofThisEvent* HCE) override {
       fCellTrackLogger.clear();
     }
+    void SetParticleName(const G4String& particleName);
 
   private:
     G4int fHCID;
     AbsorberHitsCollection* fHitsCollection;
     std::map<G4int, G4TrackLogger> fCellTrackLogger;
+    G4ParticleDefinition* fParticleSel;
 
     inline G4int GetIndex(const G4Step* aStep) {
       G4StepPoint* preStep = aStep->GetPreStepPoint();
@@ -91,4 +95,3 @@ class AbsorberSD : public G4VSensitiveDetector
 
 
 #endif /* end of include guard B01ABSORBERSD_HH */
-

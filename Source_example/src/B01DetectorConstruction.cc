@@ -474,6 +474,7 @@ void B01DetectorConstruction::ConstructSDandField()
   // Create a sensitive detector to record the energy spectrum of 
   // particles entering the shielding layers
   AbsorberSD* absorberSD = new AbsorberSD("absorberSD");
+  absorberSD->SetParticleName(particleName);
   SDman->AddNewDetector(absorberSD);
   for (auto &lv : fLogicalVolumeVector) {
     SetSensitiveDetector(lv, absorberSD);

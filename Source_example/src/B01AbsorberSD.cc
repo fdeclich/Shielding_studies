@@ -57,10 +57,18 @@ void AbsorberSD::Initialize(G4HCofThisEvent *hce)
   hce->AddHitsCollection(fHCID,fHitsCollection);
 }
 
+void AbsorberSD::SetParticleName (const G4String &particlename) {
+  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
+  fParticleSel = particleTable->FindParticle(particlename);
+  if (fParticleSel) {
+    G4cout << "Particle filter set to: " << fParticleSel->GetParticleName() << G4endl;
+  }
+}
+
 G4bool AbsorberSD::ProcessHits(G4Step *aStep, G4TouchableHistory *)
 {
   G4ParticleDefinition* particle = aStep->GetTrack()->GetDefinition();
-  if (particle != G4Neutron::Neutron()) return false;
+  if (fParticleSel && particle != fParticleSel) return false;
 
   const G4int index = GetIndex(aStep);
   G4TrackLogger& tlog = fCellTrackLogger[index];
