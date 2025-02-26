@@ -8,6 +8,7 @@
 #include "TChain.h"
 #include "TRatioPlot.h"
 #include "TLegend.h"
+#include "TApplication.h"
 
 struct TrkEvent_t {
   std::vector<double>* _energy = {}; 
@@ -22,7 +23,8 @@ struct TrkEvent_t {
 std::vector<TH1D*> biased_hists(const TString file_list_path)
 {
   std::vector<TString> layer_names = {
-    "water_PV", "steel0_PV", "plywood0_PV", "borpol0_PV", "plywood1_PV", 
+    "water0_PV", "water1_PV","water2_PV","water3_PV","water4_PV","water5_PV",
+    "water6_PV","water7_PV","water8_PV","water9_PV","steel0_PV", "plywood0_PV", "borpol0_PV", "plywood1_PV", 
     "poly0_PV", "plywood2_PV", "steel1_PV", "plywood3_PV", "poly1_PV",
     "plywood4_PV", "borpol1_PV", "plywood5_PV", "steel2_PV"
   };
@@ -92,7 +94,8 @@ std::vector<TH1D*> biased_hists(const TString file_list_path)
 std::vector<TH1D*> unbiased_hists(const TString file_list_path)
 {
   std::vector<TString> layer_names = {
-    "water_PV", "steel0_PV", "plywood0_PV", "borpol0_PV", "plywood1_PV", 
+    "water0_PV", "water1_PV","water2_PV","water3_PV","water4_PV","water5_PV",
+    "water6_PV","water7_PV","water8_PV","water9_PV","steel0_PV", "plywood0_PV", "borpol0_PV", "plywood1_PV", 
     "poly0_PV", "plywood2_PV", "steel1_PV", "plywood3_PV", "poly1_PV",
     "plywood4_PV", "borpol1_PV", "plywood5_PV", "steel2_PV"
   };
@@ -159,6 +162,15 @@ std::vector<TH1D*> unbiased_hists(const TString file_list_path)
   return unbiased_layer_hists;
 }
 
+void biased_printing(std::vector<TH1D*> biased) {
+  std::vector<TCanvas*> canvas(biased.size());
+  for (int i = 0; i < biased.size(); i++) {
+    canvas[i] = new TCanvas(Form("Canvas_%d", i), "Spectrum");
+    biased[i]->Draw();
+    canvas[i]->SaveAs(Form("../Images/plot_layer_%d.png", i));
+  }
+}
+
 void histos_compatibility (std::vector<TH1D*> biased, std::vector<TH1D*> unbiased) {
   std::vector <double_t> chis(biased.size());
   std::vector <TRatioPlot*> res(biased.size());
@@ -172,21 +184,26 @@ void histos_compatibility (std::vector<TH1D*> biased, std::vector<TH1D*> unbiase
     biased[i]->Scale(1/n_entry_b);
     unbiased[i]->Scale(1/n_entry_u);
     chis[i] = unbiased[i]->Chi2Test(biased[i], "WW");
-    res[i] = new TRatioPlot(unbiased[i], biased[i]);
+    res[i] = new TRatioPlot(unbiased[i], biased[i], "diffsig");
     unbiased[i]->SetLineColor(kRed);
+    res[i]->GetLowYaxis()->SetRangeUser(-5, 5);
     res[i]->Draw();
     res[i]->GetUpperPad()->cd();
     TLegend* legend = new TLegend(0.15,0.7,0.4,0.85);
     legend->AddEntry(biased[i], "Biased histo", "l");
     legend->AddEntry(unbiased[i], "Unbiased histo", "l");
     legend->Draw();
-    canvas[i]->SaveAs(Form ("../Images/Comparison_%d.png", i));
+    canvas[i]->SaveAs(Form ("../Images/Comparison_gamma_%d.png", i));
     std::cout << "Chi2 compatibility test result for the " << i << " layer: " << chis[i] << std::endl;
   }
 }
 int main (int argc, char* argv[]) {
   TString file_list_path_biased = argv[1];
   TString file_list_path_unbiased = argv[2];
-  histos_compatibility(biased_hists(file_list_path_biased), unbiased_hists(file_list_path_unbiased));
+  TApplication app("histogram_analysis", &argc, argv);
+  app.InitializeGraphics(kFALSE);
+  biased_printing(biased_hists(file_list_path_biased));
+  //histos_compatibility(biased_hists(file_list_path_biased), unbiased_hists(file_list_path_unbiased));
+  app.Run();
   return 0;
 }
