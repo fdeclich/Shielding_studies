@@ -82,7 +82,10 @@ std::vector<TH1D*> biased_hists(const TString file_list_path)
       auto& energy = layer_events[i]._energy;
       auto& weight = layer_events[i]._weight;
       for (int s = 0; s < energy->size(); s ++) {
-        biased_layer_hists[i]->Fill((*energy)[s], (*weight)[s]);
+        //biased_layer_hists[i]->Fill((*energy)[s], (*weight)[s]);
+        biased_layer_hists[i]->Fill((*energy)[s]);
+        biased_layer_hists[i]->SetLineColor(kOrange);
+        biased_layer_hists[i]->SetLineWidth(2);
         biased_layer_hists_weights[i]->Fill((*weight)[s]);
       }
       i++; 
@@ -163,12 +166,11 @@ std::vector<TH1D*> unbiased_hists(const TString file_list_path)
 }
 
 void biased_printing(std::vector<TH1D*> biased) {
-  std::vector<TCanvas*> canvas(biased.size());
+  TFile outputFile("biased_hists.root", "RECREATE");
   for (int i = 0; i < biased.size(); i++) {
-    canvas[i] = new TCanvas(Form("Canvas_%d", i), "Spectrum");
-    biased[i]->Draw();
-    canvas[i]->SaveAs(Form("../Images/plot_layer_%d.png", i));
+    biased[i]->Write();
   }
+  outputFile.Close();
 }
 
 void histos_compatibility (std::vector<TH1D*> biased, std::vector<TH1D*> unbiased) {
@@ -203,7 +205,7 @@ int main (int argc, char* argv[]) {
   TApplication app("histogram_analysis", &argc, argv);
   app.InitializeGraphics(kFALSE);
   biased_printing(biased_hists(file_list_path_biased));
-  //histos_compatibility(biased_hists(file_list_path_biased), unbiased_hists(file_list_path_unbiased));
+  histos_compatibility(biased_hists(file_list_path_biased), unbiased_hists(file_list_path_unbiased));
   app.Run();
   return 0;
 }
