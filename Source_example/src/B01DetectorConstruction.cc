@@ -239,7 +239,16 @@ G4VPhysicalVolume* B01DetectorConstruction::Construct()
   };
 
   std::vector<shieldLayer_t> layers;
-  layers.emplace_back(15 * cm, water, G4Colour(0, 0, 0.9), "water");
+  layers.emplace_back(1.5 * cm, water, G4Colour(0, 0, 0.9), "water0");
+  layers.emplace_back(1.5 * cm, water, G4Colour(0, 0, 0.91), "water1");
+  layers.emplace_back(1.5 * cm, water, G4Colour(0, 0, 0.92), "water2");
+  layers.emplace_back(1.5 * cm, water, G4Colour(0, 0, 0.93), "water3");
+  layers.emplace_back(1.5 * cm, water, G4Colour(0, 0, 0.94), "water4");
+  layers.emplace_back(1.5 * cm, water, G4Colour(0, 0, 0.95), "water5");
+  layers.emplace_back(1.5 * cm, water, G4Colour(0, 0, 0.96), "water6");
+  layers.emplace_back(1.5 * cm, water, G4Colour(0, 0, 0.97), "water7");
+  layers.emplace_back(1.5 * cm, water, G4Colour(0, 0, 0.98), "water8");
+  layers.emplace_back(1.5 * cm, water, G4Colour(0, 0, 0.99), "water9");
   layers.emplace_back(1.5 * cm, steel, G4Colour(0.55, 0.5, 0.65), "steel0");
   layers.emplace_back(.5 * cm, plywood, G4Colour(0.5, 0.35, 0.25), "plywood0");
   layers.emplace_back(5 * cm, BoratedPolyethilene, G4Colour(0.3, 1.0, 0.0), "borpol0");
@@ -305,10 +314,12 @@ G4VIStore* B01DetectorConstruction::CreateImportanceStore()
   G4int n_layers = fPhysicalVolumeVector.size();
   std::vector<G4double> importance(n_layers, 1);
   if (fparticleName == "neutron") {
-    importance = {1, 335, 740, 775, 5400, 5405, 10600, 10600, 10970, 11000, 20000, 20100, 110000, 117500};
+    importance = {1, 2, 4, 8, 16, 32, 64, 128, 128, 256, 256, 512, 512, 5120, 
+                  5120, 10240, 10240, 10240, 10240, 20480, 20480, 102400, 102400};
   }
   else if (fparticleName == "gamma") {
-    importance = {1, 2, 6, 6, 7.8, 7.8, 9.2, 9.2, 10.2, 10.2, 12.4, 12.4, 16, 16};
+    importance = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 6, 6, 
+                  7.8, 7.8, 9.2, 9.2, 10.2, 10.2, 12.4, 12.4, 16, 16};
   }
   else {
     std::cout << "Importances not defined for this " << fparticleName << std::endl;
