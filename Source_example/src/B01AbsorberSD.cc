@@ -72,7 +72,14 @@ G4bool AbsorberSD::ProcessHits(G4Step *aStep, G4TouchableHistory *)
 
   const G4int index = GetIndex(aStep);
   G4TrackLogger& tlog = fCellTrackLogger[index];
-  if (tlog.FirstEnterance(aStep->GetTrack()->GetTrackID())) {
+  G4bool rightEntrance = aStep->IsFirstStepInVolume();
+  if (rightEntrance == true) {
+    G4double pZ = aStep->GetPreStepPoint()->GetMomentumDirection().z();
+    if (pZ < 0) {
+      rightEntrance = false;
+    }
+  }
+  if (tlog.FirstEnterance(aStep->GetTrack()->GetTrackID()) && rightEntrance == true) {
     G4double w = aStep->GetPreStepPoint()->GetWeight();
     G4double energy = aStep->GetPreStepPoint()->GetKineticEnergy();
 
