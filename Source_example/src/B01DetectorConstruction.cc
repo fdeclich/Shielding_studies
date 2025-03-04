@@ -251,7 +251,9 @@ G4VPhysicalVolume* B01DetectorConstruction::Construct()
   layers.emplace_back(1.5 * cm, water, G4Colour(0, 0, 0.99), "water9");
   layers.emplace_back(1.5 * cm, steel, G4Colour(0.55, 0.5, 0.65), "steel0");
   layers.emplace_back(.5 * cm, plywood, G4Colour(0.5, 0.35, 0.25), "plywood0");
-  layers.emplace_back(5 * cm, BoratedPolyethilene, G4Colour(0.3, 1.0, 0.0), "borpol0");
+  layers.emplace_back(1.66 * cm, BoratedPolyethilene, G4Colour(0.3, 1.0, 0.0), "borpol0");
+  layers.emplace_back(1.66 * cm, BoratedPolyethilene, G4Colour(0.3, 1.0, 0.01), "borpol1");
+  layers.emplace_back(1.66 * cm, BoratedPolyethilene, G4Colour(0.3, 1.0, 0.02), "borpol2");
   layers.emplace_back(.5 * cm, plywood, G4Colour(0.5, 0.35, 0.25), "plywood1");
   layers.emplace_back(19.5 * cm, polyurethane, G4Colour(1.0, 1.0, 0.0), "poly0");
   layers.emplace_back(.5 * cm, plywood, G4Colour(0.5, 0.35, 0.25), "plywood2");
@@ -259,7 +261,7 @@ G4VPhysicalVolume* B01DetectorConstruction::Construct()
   layers.emplace_back(.5 * cm, plywood, G4Colour(0.5, 0.35, 0.25), "plywood3");
   layers.emplace_back(19.5 * cm, polyurethane, G4Colour(1.0, 1.0, 0.0), "poly1");
   layers.emplace_back(.5 * cm, plywood, G4Colour(0.5, 0.35, 0.25), "plywood4");
-  layers.emplace_back(5 * cm, BoratedPolyethilene, G4Colour(0.3, 1.0, 0.0), "borpol1");
+  layers.emplace_back(5 * cm, BoratedPolyethilene, G4Colour(0.3, 1.0, 0.03), "borpol3");
   layers.emplace_back(.5 * cm, plywood, G4Colour(0.5, 0.35, 0.25), "plywood5");
   layers.emplace_back(0.6 , steel, G4Colour(0.55, 0.5, 0.65), "steel2");
 
@@ -314,11 +316,11 @@ G4VIStore* B01DetectorConstruction::CreateImportanceStore()
   G4int n_layers = fPhysicalVolumeVector.size();
   std::vector<G4double> importance(n_layers, 1);
   if (fparticleName == "neutron") {
-    importance = {1, 2, 4, 8, 16, 32, 64, 128, 128, 256, 256, 512, 512, 5120, 
-                  5120, 10240, 10240, 10240, 10240, 20480, 20480, 102400, 102400};
+    importance = {1, 2, 4, 8, 16, 32, 64, 128, 128, 256, 256, 512, 512, 1024, 2048, 4096, 
+                  4096, 8192, 8192, 8192, 8192, 16384, 16384, 16384, 16384};
   }
   else if (fparticleName == "gamma") {
-    importance = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 6, 6, 
+    importance = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 6, 6, 6, 6, 
                   7.8, 7.8, 9.2, 9.2, 10.2, 10.2, 12.4, 12.4, 16, 16};
   }
   else {
