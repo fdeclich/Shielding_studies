@@ -82,8 +82,7 @@ std::vector<TH1D*> biased_hists(const TString file_list_path)
       auto& energy = layer_events[i]._energy;
       auto& weight = layer_events[i]._weight;
       for (int s = 0; s < energy->size(); s ++) {
-        //biased_layer_hists[i]->Fill((*energy)[s], (*weight)[s]);
-        biased_layer_hists[i]->Fill((*energy)[s]);
+        biased_layer_hists[i]->Fill((*energy)[s], (*weight)[s]);
         biased_layer_hists[i]->SetLineColor(kOrange);
         biased_layer_hists[i]->SetLineWidth(2);
         biased_layer_hists_weights[i]->Fill((*weight)[s]);
